@@ -1,0 +1,194 @@
+/* TIPOGRAFÍAS IGUALES AL LOGIN */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* PALETA */
+:root {
+  --rose:       #D38F7A;
+  --mustard:    #B99145;
+  --coffee:     #574737;
+  --sage:       #7E8A5F;  /* verde más oscurito */
+  --terracotta: #C7764A;
+  --blush:      #E6C8B1;
+}
+
+/* RESET */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 🚨 AQUÍ VA TU IMAGEN "inicio.png" 🚨 */
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--coffee);
+
+  /* SI la imagen está en /img/inicio.png relativo a este CSS: */
+  background:
+    linear-gradient(135deg, rgba(246, 225, 209, 0.55), rgba(230, 200, 177, 0.7)),
+    url("../img/inicio.png") center/cover no-repeat fixed;
+  /* SI la tienes al lado de register.php, cambia la línea de arriba por:
+     url("../inicio.png") center/cover no-repeat fixed;
+  */
+}
+
+/* LAYOUT CENTRADO */
+.register-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+/* RECUADRO BLANCO TRANSPARENTE */
+.register-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 32px 40px 30px;
+  background: rgba(255, 255, 255, 0.78);  /* blanco translúcido */
+  border-radius: 20px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+/* TITULOS ELEGANTES */
+.heading-serif {
+  font-family: "Cormorant Garamond", "Times New Roman", serif;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.overline {
+  font-size: 12px;
+  margin: 0 0 8px;
+  color: rgba(87, 71, 55, 0.7);
+}
+
+.main-title {
+  font-size: 30px;
+  letter-spacing: 0.14em;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  margin: 0 0 24px;
+  font-size: 14px;
+  color: rgba(87, 71, 55, 0.82);
+}
+
+/* FORMULARIO */
+.register-form {
+  margin-bottom: 18px;
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.field-inline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* LABELS MARRÓN */
+.field label {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  color: rgba(87, 71, 55, 0.85);
+}
+
+/* INPUTS CON LÍNEA MARRÓN */
+.field input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid rgba(87, 71, 55, 0.45);
+  padding: 7px 0 9px;
+  font-size: 15px;
+  background: transparent;
+  color: var(--coffee);
+}
+
+.field input:focus {
+  outline: none;
+  border-bottom-color: var(--sage); /* verde oscuro como acento */
+}
+
+/* BOTÓN */
+.form-footer {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  border: none;
+  background: var(--terracotta);
+  color: #fdfaf7;
+  padding: 10px 28px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  border-radius: 999px;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* MENSAJES */
+.alert {
+  font-size: 13px;
+  padding: 9px 11px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+}
+
+.alert-error {
+  background: #ffe5e5;
+  color: #8c1010;
+}
+
+.alert-success {
+  background: #e6ffed;
+  color: #135e34;
+}
+
+/* TEXTO INFERIOR */
+.small-text {
+  font-size: 13px;
+  color: rgba(87, 71, 55, 0.8);
+  text-align: right;
+}
+
+.small-text .small-label {
+  color: var(--sage);
+}
+
+.small-text a {
+  color: var(--rose);
+  text-decoration: none;
+}
+
+.small-text a:hover {
+  text-decoration: underline;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .register-card {
+    padding: 24px 20px 22px;
+    border-radius: 16px;
+  }
+
+  .field-inline {
+    grid-template-columns: 1fr;
+  }
+}

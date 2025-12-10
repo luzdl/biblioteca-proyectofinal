@@ -1,0 +1,244 @@
+/* TIPOGRAFÍAS (look tipo "ELEGANT") */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* PALETA BASADA EN LA QUE ME PASASTE */
+:root {
+  --rose:       #D38F7A;
+  --mustard:    #B99145;
+  --coffee:     #574737;
+  --sage:       #A5AF89;
+  --terracotta: #C7764A;
+  --blush:      #E6C8B1; /* beige rosado principal */
+}
+
+/* RESET BÁSICO */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* FONDO BEIGE CON DEGRADADOS SUAVES */
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--coffee);
+
+  background:
+    radial-gradient(circle at 0% 0%, rgba(211, 143, 122, 0.22) 0, transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(185, 145, 69, 0.20) 0, transparent 50%),
+    linear-gradient(135deg, #f7ecdf, var(--blush));
+}
+
+/* ---------- LAYOUT GENERAL ---------- */
+
+/* grid: izquierda = hero, derecha = formulario */
+.auth-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+/* lado izquierdo (logo / texto) */
+.hero-side {
+  position: relative;
+  background: transparent;
+}
+
+/* logo pegado a la ESQUINA INFERIOR IZQUIERDA */
+.hero-overlay {
+  position: absolute;
+  left: 40px;      /* distancia al borde izquierdo */
+  bottom: 40px;    /* si lo quieres arriba, cambia por top: 40px; */
+  max-width: 420px;
+  margin: 0;
+  color: var(--coffee);
+}
+
+
+
+.hero-title {
+  font-size: 34px;
+  line-height: 1.1;
+  margin: 0 0 10px;
+}
+
+.hero-text {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* LADO DERECHO: FORMULARIO */
+
+.form-side {
+  grid-column: 2;              /* sigue en la columna derecha */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;   /* 👈 AHORA LO EMPUJA HACIA LA DERECHA */
+  padding: 48px 80px;          /* padding igual a ambos lados */
+  background: transparent;
+}
+
+
+.form-wrapper {
+  width: 100%;
+  max-width: 460px;            /* tamaño del formulario */
+}
+
+
+/* ESTILO "ELEGANT" PARA TÍTULOS */
+
+.heading-serif {
+  font-family: "Cormorant Garamond", "Times New Roman", serif;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.overline {
+  font-size: 11px;
+  margin: 0 0 6px;
+  color: rgba(87, 71, 55, 0.72);
+}
+
+.main-title {
+  font-size: 28px;
+  letter-spacing: 0.12em;
+  margin: 0 0 6px;
+}
+
+.subtitle {
+  margin: 0 0 24px;
+  font-size: 13px;
+  color: rgba(87, 71, 55, 0.8);
+}
+
+/* FORMULARIO TIPO CONTACTO (LÍNEA ABAJO) */
+
+.auth-form {
+  margin-bottom: 16px;
+}
+
+.field {
+  margin-bottom: 18px;
+}
+
+.field label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  color: rgba(87, 71, 55, 0.7);
+}
+
+.field input,
+.field select {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid rgba(87, 71, 55, 0.35);
+  padding: 7px 0 10px;
+  font-size: 16px;
+  background: transparent;
+  color: var(--coffee);
+}
+
+/* quitar el estilo feo del select nativo */
+.field select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* foco bonito */
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-bottom-color: var(--terracotta);
+}
+
+.field-select {
+  position: relative;
+}
+
+.field-select::after {
+  content: "▾";
+  position: absolute;
+  right: 0;
+  bottom: 12px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(87, 71, 55, 0.7);
+  pointer-events: none;
+}
+
+
+/* BOTÓN */
+
+.form-footer {
+  margin-top: 10px;
+}
+
+.btn-primary {
+  display: inline-block;
+  border: none;
+  background: var(--terracotta);
+  color: #fdfaf7;
+  padding: 9px 24px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  border-radius: 999px;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* MENSAJES */
+
+.alert {
+  font-size: 13px;
+  padding: 8px 10px;
+  margin-bottom: 14px;
+  border-radius: 6px;
+}
+
+.alert-error {
+  background: #ffe5e5;
+  color: #8c1010;
+}
+
+.alert-success {
+  background: #e6ffed;
+  color: #135e34;
+}
+
+/* TEXTO INFERIOR */
+
+.small-text {
+  font-size: 12px;
+  color: rgba(87, 71, 55, 0.8);
+}
+
+.small-text a {
+  color: var(--rose);
+  text-decoration: none;
+}
+
+.small-text a:hover {
+  text-decoration: underline;
+}
+
+/* RESPONSIVE PARA CELULAR */
+
+@media (max-width: 900px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+  }
+  .hero-side {
+    display: none; /* si quieres ver tu arte en mobile, quita esta línea */
+  }
+}
