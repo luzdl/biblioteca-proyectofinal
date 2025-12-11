@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $sql = "SELECT id, usuario, email, password_hash, rol
                     FROM usuarios
                     WHERE (email = :valor OR usuario = :valor)
-                      AND rol = :rol
+                    AND rol = :rol
                     LIMIT 1";
 
             $stmt = $db->prepare($sql);
