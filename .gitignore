@@ -1,0 +1,29 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# PHPStorm / JetBrains
+.idea/
+
+# Composer
+/vendor/
+
+# Node
+node_modules/
+
+# Logs
+*.log
+
+# Build / temp
+tmp/
+
+# Database dumps (optional)
+*.sql
+
+# Ignore user uploads if any
+public/uploads/

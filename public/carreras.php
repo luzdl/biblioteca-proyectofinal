@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/env.php';
 require_once __DIR__ . '/auth.php';               // protege la página
 require_once __DIR__ . '/../config/database.php';
 

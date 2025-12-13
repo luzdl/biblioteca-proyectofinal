@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 10-12-2025 a las 22:29:28
+-- Tiempo de generación: 13-12-2025 a las 04:24:43
 -- Versión del servidor: 12.0.2-MariaDB
 -- Versión de PHP: 8.0.7
 
@@ -82,7 +82,10 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id`, `cip`, `primer_nombre`, `segundo_nombre`, `primer_apellido`, `segundo_apellido`, `fecha_nacimiento`, `carrera_id`, `usuario`, `email`, `password_hash`, `created_at`, `administrador`, `rol`) VALUES
-(1, '20-70-7664', 'María', 'Alejandra', 'Ferrer', 'Valles', '2003-10-04', 2, 'mariaafferrer', 'maria.ferrer@utp.ac.pa', '$2y$10$JZYTtrtLbWHDjsjbnnl1uOScVJyINy.ldmavnJQAMZkVt3r8VO19K', '2025-12-10 14:45:12', 'estudiante', 'estudiante');
+(2, '0-000-001', 'Admin', NULL, 'General', NULL, '1985-01-01', 1, 'admin', 'admin@biblioteca.com', '$2y$10$C4bRGjp6Ajt41kVQ/HgQ3u0gM0MoxSLO2YURg3Ri4ARSJtkCQSK3S', '2025-12-12 19:03:05', 'estudiante', 'administrador'),
+(3, '0-000-002', 'Maria', NULL, 'Bibliotecaria', NULL, '1992-05-12', 1, 'biblio', 'bibliotecaria@biblioteca.com', '$2y$10$8z5BrVt9fP7E7EdfMnRg.uNJVbzXY0Vq1tViTsz1b2VPRPyRusXbO', '2025-12-12 19:03:06', 'estudiante', 'bibliotecario'),
+(4, '1-111-111', 'José', NULL, 'Bustamante', NULL, '2002-03-20', 1, 'joseb', 'jose@biblioteca.com', '$2y$10$7CbG2T1WJ9gIxHS9eP5bQOdH9E5w2kvCL5JvD4zca5JL1Mp/sInS6', '2025-12-12 19:03:06', 'estudiante', 'estudiante'),
+(5, '1-222-222', 'Abigail', NULL, 'Koo', NULL, '2001-07-10', 2, 'abikoo', 'abi@biblioteca.com', '$2y$10$G2Xu6XdrtHzV1gwq5HCWOuqBp1tVpiRAIUsLLvdTGMlJPQDRZeZSK', '2025-12-12 19:03:06', 'estudiante', 'estudiante');
 
 --
 -- Índices para tablas volcadas
@@ -128,7 +131,7 @@ ALTER TABLE `categorias_libros`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

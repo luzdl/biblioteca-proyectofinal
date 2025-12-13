@@ -32,6 +32,26 @@ DB_USER=epiz_XXXXXXX
 DB_PASS=tu_contraseña
 ```
 
+## 5. Scripts para migración segura (no recrear DB)
+
+Se añadieron dos archivos útiles para aplicar la estructura y datos iniciales sin borrar la base existente:
+
+- `biblioteca_digital_idempotent.sql`: versión idempotente del dump. Usa `CREATE TABLE IF NOT EXISTS` y `INSERT IGNORE` para no duplicar ni borrar datos existentes.
+- `scripts/migrate_db.php`: script PHP que ejecuta el SQL idempotente contra la base usando las variables de entorno del proyecto.
+
+Cómo usar el script de migración (localmente con XAMPP):
+
+1. Asegúrate de que `c:\xampp\htdocs\biblioteca-proyectofinal\.env` exista y tenga tus credenciales.
+2. Abre PowerShell en la raíz del proyecto y ejecuta:
+
+```powershell
+php .\scripts\migrate_db.php
+```
+
+El script intentará ejecutar cada statement del SQL idempotente y seguirá si algunos comandos no aplican. Revisa los mensajes de `WARNING` si algo no pudo aplicarse.
+
+Si prefieres usar phpMyAdmin, puedes importar `biblioteca_digital_idempotent.sql` desde la interfaz; las declaraciones `IF NOT EXISTS` harán que no se reemplacen tablas ya existentes.
+
 ## 2. Nomenclatura para trabajos relacionados a la base de datos
 
 - **Tablas**: Usa nombres en minúsculas y en plural si almacenan colecciones (ejemplo: `usuarios`, `libros`, `prestamos`).

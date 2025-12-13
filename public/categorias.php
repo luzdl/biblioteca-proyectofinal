@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/env.php';
 require_once __DIR__ . '/admin_only.php';       
 require_once __DIR__ . '/../config/database.php';
 
