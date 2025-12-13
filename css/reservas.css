@@ -1,0 +1,151 @@
+/* ------------------------------------
+   ESTILO GENERAL PREMIUM MARRÓN
+------------------------------------ */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+    background: #f4f2ef;
+    color: #2e2e2e;
+}
+
+/* ------------------------------------
+   PANEL LATERAL
+------------------------------------ */
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: #ffffff;
+    padding: 40px 30px;
+    box-shadow: 4px 0 18px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sidebar .logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: #b7874b;
+    margin-bottom: 40px;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.sidebar nav a {
+    text-decoration: none;
+    font-size: 18px;
+    color: #4d4d4d;
+    padding: 10px 14px;
+    border-radius: 12px;
+    transition: 0.25s;
+}
+
+.sidebar nav a:hover {
+    background: #f0e8df;
+}
+
+.sidebar nav a.active {
+    background: #e7dbc8;
+    font-weight: 600;
+}
+
+.sidebar .logout {
+    color: #b2554d;
+    font-weight: 600;
+    margin-bottom: 40px;
+}
+
+/* ------------------------------------
+   CONTENIDO PRINCIPAL
+------------------------------------ */
+.main {
+    margin-left: 300px;
+    padding: 50px 70px;
+}
+
+.main h1 {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.main h2 {
+    font-size: 26px;
+    margin-bottom: 40px;
+    color: #2d2d2d;
+}
+
+/* ------------------------------------
+   GRID DE RESERVAS
+------------------------------------ */
+.reservas-grid {
+    display: flex;
+    gap: 80px;
+    align-items: flex-start;
+}
+
+.reserva-card {
+    width: 220px;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.07);
+    transition: 0.25s;
+}
+
+.reserva-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+
+.reserva-card img {
+    width: 160px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 14px;
+}
+
+.reserva-card .title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.reserva-card .author {
+    font-size: 15px;
+    color: #6d6d6d;
+    margin-bottom: 6px;
+}
+
+.reserva-card .estado {
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* ------------------------------------
+   BOTÓN CANCELAR RESERVA
+------------------------------------ */
+.cancelar-btn {
+    display: inline-block;
+    width: 100%;
+    padding: 12px 0;
+    background: #f5c7b8;
+    color: #8b3c34;
+    font-weight: 700;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: 0.25s;
+}
+
+.cancelar-btn:hover {
+    background: #e3a793;
+}

@@ -1,141 +1,296 @@
-/* =========================================================
-   ESTILOS PARA LA VISTA DEL ESTUDIANTE
-   Biblioteca Digital
-========================================================= */
+/* -----------------------------------------
+   ESTILO GENERAL
+----------------------------------------- */
 
-body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background: #f6efe7;
-    color: #3d2f2f;
-}
+/* ===== SIDEBAR GENERAL ===== */
 
-/* HEADER SUPERIOR */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #b98068;
-    padding: 18px 40px;
-    color: #fff;
-    font-weight: 500;
-}
-
-.header .username {
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.header a {
-    color: #fff;
-    text-decoration: none;
-    background: #8a5a44;
-    padding: 8px 14px;
-    border-radius: 6px;
-    transition: 0.2s;
-}
-
-.header a:hover {
-    background: #703f2b;
-}
-
-/* CONTENEDOR GENERAL */
-.container {
-    max-width: 1100px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
-
-/* BUSCADOR */
-.search-bar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
-}
-
-.search-bar input {
-    flex: 1;
-    padding: 14px;
-    border: 1px solid #cdb7aa;
-    border-radius: 8px;
-    font-size: 16px;
-    background: #fff;
-}
-
-.search-bar button {
-    padding: 14px 26px;
-    background: #b98068;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.search-bar button:hover {
-    background: #a26b55;
-}
-
-/* GRID DE LIBROS */
-.book-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 22px;
-}
-
-/* TARJETA DE LIBRO */
-.book-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    background: #faf5ef;
+    border-right: 2px solid #e4d7c7;
+    padding: 30px 20px;
+    position: fixed;
+    top: 0; left: 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    font-family: "Inter", sans-serif;
+}
+
+/* LOGO SUPERIOR */
+.sidebar-logo {
+    text-align: center;
+}
+
+.sidebar-logo img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 8px;
+    object-fit: cover;
+    border: 3px solid #d6bfa5;
+}
+
+.sidebar-logo h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #b68c5a;
+    margin: 0;
+}
+
+/* MENÚ PRINCIPAL */
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.sidebar-menu a {
+    text-decoration: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #5d4a3f;
+    transition: 0.3s ease;
+}
+
+/* HOVER */
+.sidebar-menu a:hover {
+    background: #e8d8c8;
+    color: #3c2d24;
+    padding-left: 22px;
+}
+
+/* BOTÓN CERRAR SESIÓN */
+.logout-btn {
+    margin-top: 20px;
+    text-decoration: none;
+    color: #c44b4b;
+    padding: 12px 16px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.logout-btn:hover {
+    background: #f5d2d2;
+    padding-left: 22px;
+}
+
+/* USUARIO INFERIOR */
+.sidebar-user {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.sidebar-user img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-bottom: 5px;
+    object-fit: cover;
+}
+
+.sidebar-user p {
+    color: #7a5f46;
+    font-size: 15px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #f4f1ea;
+    font-family: 'Inter', sans-serif;
+    color: #3f2f1d;
+}
+
+/* -----------------------------------------
+   NAV SUPERIOR
+----------------------------------------- */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 90px;
+    background: #ffffff;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.08);
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: #3f2f1d;
+}
+
+.menu a {
+    text-decoration: none;
+    margin: 0 18px;
+    font-size: 17px;
+    color: #6e6458;
+    padding-bottom: 4px;
+    transition: 0.3s;
+}
+
+.menu a:hover {
+    color: #b78a5f;
+}
+
+.menu .active {
+    color: #b78a5f;
+    font-weight: 600;
+    border-bottom: 2px solid #b78a5f;
+}
+
+.usuario {
+    font-weight: 600;
+    color: #3f2f1d;
+}
+
+/* -----------------------------------------
+   BUSCADOR
+----------------------------------------- */
+.search-box {
+    display: flex;
+    justify-content: center;
+    margin: 28px 0;
+}
+
+.search-box input {
+    width: 520px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    border: 2px solid #e4d9cc;
+    outline: none;
+    background: #ffffff;
+    font-size: 16px;
+    color: #3f2f1d;
+    transition: 0.3s;
+}
+
+.search-box input:focus {
+    border-color: #b78a5f;
+}
+
+.search-box button {
+    margin-left: 12px;
+    padding: 14px 26px;
+    background: #c79d6e;
+    border: none;
+    border-radius: 14px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: 0.25s;
+}
+
+.search-box button:hover {
+    background: #b5895f;
+}
+
+/* -----------------------------------------
+   CONTENIDO PRINCIPAL
+----------------------------------------- */
+.container {
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-size: 34px;
+    font-weight: 700;
+    margin-bottom: 26px;
+    text-align: left;
+    padding-left: 30px;
+}
+
+/* -----------------------------------------
+   GRID DE LIBROS (3 POR FILA)
+----------------------------------------- */
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    padding: 0 30px 50px;
+}
+
+/* -----------------------------------------
+   TARJETAS DE LIBROS
+----------------------------------------- */
+.book-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 26px 20px 32px;
+    text-align: center;
+    box-shadow: 0px 6px 16px rgba(0,0,0,0.08);
+    transition: 0.3s ease;
+}
+
+.book-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0px 10px 24px rgba(0,0,0,0.13);
+}
+
+.book-image img {
+    width: 140px;
+    height: 190px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 16px;
 }
 
 .book-title {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     margin-bottom: 6px;
 }
 
-.book-author {
-    font-size: 14px;
-    opacity: 0.8;
-    margin-bottom: 12px;
-}
-
+.book-author,
 .book-category {
-    background: #e7d5ca;
-    padding: 6px 10px;
-    border-radius: 8px;
-    display: inline-block;
-    font-size: 12px;
-    margin-bottom: 18px;
+    color: #6e6458;
+    margin-bottom: 5px;
 }
 
 .book-stock {
-    margin-bottom: 14px;
+    margin: 14px 0;
     font-weight: 600;
 }
 
-.book-card a {
-    background: #b98068;
-    padding: 10px 14px;
-    text-align: center;
-    border-radius: 8px;
-    color: #fff;
-    text-decoration: none;
-    transition: 0.2s;
-}
-
-.book-card a:hover {
-    background: #8a5a44;
-}
-
-/* Agotado */
-.out-of-stock {
-    color: #c0392b;
+.agotado {
+    color: #c05b4d;
     font-weight: bold;
+}
+
+/* -----------------------------------------
+   BOTONES
+----------------------------------------- */
+.reserve-btn {
+    background: #c79d6e;
+    padding: 12px 0;
+    display: block;
+    width: 70%;
+    margin: 0 auto;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.25s ease;
+}
+
+.reserve-btn:hover {
+    background: #b5895f;
+}
+
+/* Botón deshabilitado */
+.reserve-disabled {
+    background: #d5d0ca;
+    padding: 12px 0;
+    border-radius: 12px;
+    width: 70%;
+    margin: 0 auto;
+    color: #6e6458;
+    font-weight: 600;
 }

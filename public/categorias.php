@@ -86,6 +86,34 @@ $categorias = $stmt->fetchAll();
     <title>Categorías de libros | Biblioteca Digital</title>
 </head>
 <body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    
+    <!-- LOGO SUPERIOR -->
+    <div class="sidebar-logo">
+        <img src="../img/logo_redondo.png" alt="Logo">
+        <h2>ReadOwl</h2>
+    </div>
+
+    <!-- MENÚ LATERAL -->
+    <nav class="sidebar-menu">
+        <a href="student_only.php">Catálogo</a>
+        <a href="student_reservas.php">Mis reservas</a>
+        <a href="student_historial.php">Historial</a>
+        <a href="perfil_estudiante.php">Perfil</a>
+    </nav>
+
+    <!-- CERRAR SESIÓN -->
+    <a href="logout.php" class="logout-btn">Cerrar sesión</a>
+
+    <!-- USUARIO INFERIOR -->
+    <div class="sidebar-user">
+        <img src="../img/user_placeholder.png" alt="Usuario">
+        <p><i><?php echo htmlspecialchars($_SESSION['usuario_usuario']); ?></i></p>
+    </div>
+</aside>
+
     <h1>Categorías de libros</h1>
 
     <?php if ($mensaje): ?>

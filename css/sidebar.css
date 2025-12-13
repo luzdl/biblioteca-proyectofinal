@@ -1,0 +1,103 @@
+/* ==========================
+   SIDEBAR PREMIUM TONOS TIERRA
+   ========================== */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    background: #f5eee4;
+    border-right: 2px solid #e0d3c2;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 3px 0 10px rgba(0,0,0,0.05);
+}
+
+/* Logo */
+.sidebar-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar-logo img {
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.sidebar-logo h2 {
+    font-size: 24px;
+    margin-top: 10px;
+    color: #7a5c3a;
+    font-weight: 700;
+}
+
+/* Menú */
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sidebar-menu a {
+    padding: 12px 18px;
+    font-size: 16px;
+    text-decoration: none;
+    color: #4e3b26;
+    border-radius: 10px;
+    transition: 0.25s ease;
+}
+
+.sidebar-menu a:hover {
+    background: #e8d9c7;
+    color: #3a2b1b;
+    transform: translateX(6px);
+}
+
+.sidebar-menu .active {
+    background: #d6c4af;
+    color: #3a2b1b;
+    font-weight: bold;
+}
+
+/* Botón cerrar sesión */
+.logout-btn {
+    margin-top: 20px;
+    padding: 12px;
+    text-align: center;
+    border-radius: 10px;
+    background: #e7b6b1;
+    color: #7a2f2f;
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.25s;
+}
+
+.logout-btn:hover {
+    background: #cc8e86;
+}
+
+/* Usuario inferior */
+.sidebar-user {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.sidebar-user img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.sidebar-user p {
+    font-size: 15px;
+    color: #6b4e31;
+    font-style: italic;
+}
