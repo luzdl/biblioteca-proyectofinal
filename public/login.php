@@ -7,17 +7,23 @@ require_once __DIR__ . '/../config/database.php';
 $mensaje = "";
 $tipoMensaje = ""; // "error" o "exito"
 
-// Para recordar lo que escribió el usuario si falla el login
 $usuarioOEmail = $_POST["usuario_email"] ?? "";
 $rolSolicitado = $_POST["rol"] ?? "";
 
-// Si ya está logueado, no tiene sentido volver a mostrar el login
+// Si ya está logueado, redirigir según rol
 if (isset($_SESSION['usuario_id'])) {
-    header('Location: dashboard.php');
+    if ($_SESSION['usuario_rol'] === "administrador") {
+        header("Location: admin_only.php");
+    } elseif ($_SESSION['usuario_rol'] === "bibliotecario") {
+        header("Location: staff_only.php");
+    } else {
+        header("Location: student_only.php");
+    }
     exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
     $usuarioOEmail = trim($_POST["usuario_email"] ?? "");
     $password      = $_POST["password"] ?? "";
     $rolSolicitado = $_POST["rol"] ?? "";
@@ -25,14 +31,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($usuarioOEmail === "" || $password === "" || $rolSolicitado === "") {
         $mensaje = "Por favor, completa todos los campos.";
         $tipoMensaje = "error";
-    } elseif (!in_array($rolSolicitado, ['estudiante', 'administrador'], true)) {
+    } 
+    elseif (!in_array($rolSolicitado, ['estudiante', 'administrador', 'bibliotecario'], true)) {
         $mensaje = "Rol inválido.";
         $tipoMensaje = "error";
-    } else {
+    } 
+    else {
         try {
             $db = (new Database())->getConnection();
 
-            // Buscar por email o usuario Y por el rol seleccionado
+            // Buscar por email o usuario Y por rol
             $sql = "SELECT id, usuario, email, password_hash, rol
                     FROM usuarios
                     WHERE (email = :valor OR usuario = :valor)
@@ -44,31 +52,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ':valor' => $usuarioOEmail,
                 ':rol'   => $rolSolicitado,
             ]);
+
             $usuario = $stmt->fetch();
 
             if ($usuario && password_verify($password, $usuario['password_hash'])) {
-                // Login correcto: crear sesión
+
+                // Guardar sesión
                 $_SESSION['usuario_id']      = $usuario['id'];
                 $_SESSION['usuario_usuario'] = $usuario['usuario'];
                 $_SESSION['usuario_email']   = $usuario['email'];
-                $_SESSION['usuario_rol']     = $usuario['rol']; // 👈 guardamos el rol
+                $_SESSION['usuario_rol']     = $usuario['rol'];
 
-                header('Location: dashboard.php');
+                // Redirigir según rol
+                switch ($usuario['rol']) {
+                    case "administrador":
+                        header("Location: admin_only.php");
+                        break;
+                    case "bibliotecario":
+                        header("Location: staff_only.php");
+                        break;
+                    case "estudiante":
+                        header("Location: student_only.php");
+                        break;
+                }
                 exit;
-            } else {
+            } 
+            else {
                 $mensaje = "Credenciales inválidas para el rol seleccionado.";
                 $tipoMensaje = "error";
             }
-                } catch (Exception $e) {
-            // SOLO PARA PROBAR: ver el error real
+
+        } catch (Exception $e) {
             $mensaje = "Error interno: " . $e->getMessage();
             $tipoMensaje = "error";
         }
-
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -79,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 <div class="auth-layout">
 
-    <!-- LADO IZQUIERDO -->
+    <!-- LADO IZQUIERTO -->
     <section class="hero-side">
         <div class="hero-overlay">
             <h2 class="hero-title heading-serif">
@@ -91,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
     </section>
 
-    <!-- LADO DERECHO: FORMULARIO -->
+    <!-- FORMULARIO -->
     <section class="form-side">
         <div class="form-wrapper">
             <p class="overline heading-serif">Bienvenido de nuevo</p>
@@ -129,20 +149,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
 
                 <div class="field field-select">
-    <label for="rol">Rol</label>
-    <select id="rol" name="rol">
-        <option value="">Seleccione un rol</option>
-        <option value="estudiante"
-            <?php echo $rolSolicitado === 'estudiante' ? 'selected' : ''; ?>>
-            Estudiante
-        </option>
-        <option value="administrador"
-            <?php echo $rolSolicitado === 'administrador' ? 'selected' : ''; ?>>
-            Administrador
-        </option>
-    </select>
-</div>
+                    <label for="rol">Rol</label>
+                    <select id="rol" name="rol">
+                        <option value="">Seleccione un rol</option>
 
+                        <option value="estudiante"
+                            <?php echo $rolSolicitado === 'estudiante' ? 'selected' : ''; ?>>
+                            Estudiante
+                        </option>
+
+                        <option value="bibliotecario"
+                            <?php echo $rolSolicitado === 'bibliotecario' ? 'selected' : ''; ?>>
+                            Bibliotecario
+                        </option>
+
+                        <option value="administrador"
+                            <?php echo $rolSolicitado === 'administrador' ? 'selected' : ''; ?>>
+                            Administrador
+                        </option>
+                    </select>
+                </div>
 
                 <div class="form-footer">
                     <button type="submit" class="btn-primary">

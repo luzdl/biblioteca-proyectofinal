@@ -1,0 +1,141 @@
+/* =========================================================
+   ESTILOS PARA LA VISTA DEL ESTUDIANTE
+   Biblioteca Digital
+========================================================= */
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #f6efe7;
+    color: #3d2f2f;
+}
+
+/* HEADER SUPERIOR */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #b98068;
+    padding: 18px 40px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.header .username {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.header a {
+    color: #fff;
+    text-decoration: none;
+    background: #8a5a44;
+    padding: 8px 14px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.header a:hover {
+    background: #703f2b;
+}
+
+/* CONTENEDOR GENERAL */
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* BUSCADOR */
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 14px;
+    border: 1px solid #cdb7aa;
+    border-radius: 8px;
+    font-size: 16px;
+    background: #fff;
+}
+
+.search-bar button {
+    padding: 14px 26px;
+    background: #b98068;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.search-bar button:hover {
+    background: #a26b55;
+}
+
+/* GRID DE LIBROS */
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 22px;
+}
+
+/* TARJETA DE LIBRO */
+.book-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.book-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.book-author {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-bottom: 12px;
+}
+
+.book-category {
+    background: #e7d5ca;
+    padding: 6px 10px;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 12px;
+    margin-bottom: 18px;
+}
+
+.book-stock {
+    margin-bottom: 14px;
+    font-weight: 600;
+}
+
+.book-card a {
+    background: #b98068;
+    padding: 10px 14px;
+    text-align: center;
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.book-card a:hover {
+    background: #8a5a44;
+}
+
+/* Agotado */
+.out-of-stock {
+    color: #c0392b;
+    font-weight: bold;
+}

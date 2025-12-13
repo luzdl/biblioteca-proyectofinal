@@ -2,27 +2,15 @@
 
 class Database
 {
-    private string $host;
-    private string $db_name;
-    private string $username;
-    private string $password;
+    private string $host = 'localhost';
+    private string $db_name = 'biblioteca_digital'; // <-- pon aquí el nombre REAL de tu BD
+    private string $username = 'root';
+    private string $password = '';
     private ?PDO $conn = null;
-
-    public function __construct()
-    {
-        // Cargar variables de entorno obligatorias
-        $this->host = getenv('DB_HOST');
-        $this->db_name = getenv('DB_NAME');
-        $this->username = getenv('DB_USER');
-        $this->password = getenv('DB_PASS');
-
-        if (!$this->host || !$this->db_name || !$this->username || $this->password === false) {
-            throw new Exception('Faltan variables de entorno requeridas para la conexión a la base de datos.');
-        }
-    }
 
     public function getConnection(): PDO
     {
+        // Si ya hay conexión, la reutilizamos
         if ($this->conn instanceof PDO) {
             return $this->conn;
         }
@@ -35,6 +23,7 @@ class Database
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ]);
         } catch (PDOException $e) {
+            // MIENTRAS ESTAMOS PROBANDO: muestra el error real
             die("Error de conexión: " . $e->getMessage());
         }
 

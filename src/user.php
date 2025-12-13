@@ -12,6 +12,7 @@ class User
     public int $carreraId;
     public string $usuario;
     public string $email;
+    public string $rol; // ← AGREGADO
     private string $passwordHash;
 
     public function __construct(array $data)
@@ -25,8 +26,12 @@ class User
         $this->carreraId       = (int)($data['carrera_id'] ?? 0);
         $this->usuario         = trim($data['usuario'] ?? '');
         $this->email           = trim($data['email'] ?? '');
-        $password              = $data['password'] ?? '';
 
+        // ⭐ TODOS LOS USUARIOS REGISTRADOS DESDE LA APP = ESTUDIANTES
+        $this->rol = 'estudiante';
+
+        // Manejo de contraseña
+        $password = $data['password'] ?? '';
         if ($password === '') {
             throw new InvalidArgumentException("La contraseña no puede estar vacía.");
         }
@@ -57,18 +62,18 @@ class User
                 return "Ya existe un usuario registrado con ese correo electrónico.";
             }
             if ($existing['cip'] === $this->cip) {
-                return "Ya existe un usuario registrado con esa cédula / CIP.";
+                return "Ya existe un usuario registrado con ese CIP.";
             }
             return "Ya existe un usuario con los datos proporcionados.";
         }
 
-        // 2. Insertar usuario
+        // 2. Insertar usuario (INCLUYE ROL)
         $sql = "INSERT INTO usuarios 
                 (cip, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
-                 fecha_nacimiento, carrera_id, usuario, email, password_hash, created_at)
+                 fecha_nacimiento, carrera_id, usuario, email, password_hash, rol, created_at)
                 VALUES 
                 (:cip, :primer_nombre, :segundo_nombre, :primer_apellido, :segundo_apellido,
-                 :fecha_nacimiento, :carrera_id, :usuario, :email, :password_hash, NOW())";
+                 :fecha_nacimiento, :carrera_id, :usuario, :email, :password_hash, :rol, NOW())";
 
         $stmt = $db->prepare($sql);
 
@@ -82,6 +87,7 @@ class User
         $stmt->bindValue(':usuario', $this->usuario);
         $stmt->bindValue(':email', $this->email);
         $stmt->bindValue(':password_hash', $this->passwordHash);
+        $stmt->bindValue(':rol', $this->rol); // ← AHORA SE GUARDA EL ROL
 
         $stmt->execute();
 
