@@ -27,7 +27,7 @@ html, body{
 
 /* Cuando existe sidebar (lo añade el componente al <body>) */
 body.has-sidebar{
-  padding-left: 276px !important; /* 260 ancho + margen de respiro */
+  padding-left: 2px !important; /* 260 ancho + margen de respiro */
   padding-top: 16px;
   background: var(--bg-page) !important;
 }
