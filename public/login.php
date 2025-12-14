@@ -1,19 +1,18 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../config/env.php';
+require_once __DIR__ . '/../config/router.php';
+require_once __DIR__ . '/../config/database.php';
 
 session_start();
 
-require_once __DIR__ . '/../config/router.php';
-
-require_once __DIR__ . '/../config/database.php';
-
 $mensaje = "";
-$tipoMensaje = ""; // "error" o "exito"
+$tipoMensaje = ""; // error | exito
 
-$usuarioOEmail = $_POST["usuario_email"] ?? "";
-$rolSolicitado = $_POST["rol"] ?? "";
-
-// Parámetro que indica a dónde redirigir tras login (p. ej. reservar.php?id=2)
+// Para redirección después de login
 $next = '';
 if (isset($_REQUEST['next'])) {
     $next = $_REQUEST['next'];
@@ -21,47 +20,44 @@ if (isset($_REQUEST['next'])) {
 
 // Si ya está logueado, redirigir según rol
 if (isset($_SESSION['usuario_id'])) {
-    if ($_SESSION['usuario_rol'] === "administrador") {
-        redirect('admin');
-    } elseif ($_SESSION['usuario_rol'] === "bibliotecario") {
-        redirect('staff');
-    } else {
-        redirect('student');
+    switch ($_SESSION['usuario_rol']) {
+        case 'administrador':
+            redirect('admin');
+            break;
+        case 'bibliotecario':
+            redirect('staff');
+            break;
+        default:
+            redirect('student');
     }
+    exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $usuarioOEmail = trim($_POST["usuario_email"] ?? "");
     $password      = $_POST["password"] ?? "";
-    $rolSolicitado = $_POST["rol"] ?? "";
 
-    if ($usuarioOEmail === "" || $password === "" || $rolSolicitado === "") {
+    if ($usuarioOEmail === "" || $password === "") {
         $mensaje = "Por favor, completa todos los campos.";
         $tipoMensaje = "error";
-    } 
-    elseif (!in_array($rolSolicitado, ['estudiante', 'administrador', 'bibliotecario'], true)) {
-        $mensaje = "Rol inválido.";
-        $tipoMensaje = "error";
-    } 
-    else {
+    } else {
+
         try {
             $db = (new Database())->getConnection();
 
-            // Buscar por email o usuario Y por rol
+            // Buscar SOLO por usuario o email
             $sql = "SELECT id, usuario, email, password_hash, rol
                     FROM usuarios
-                    WHERE (email = :valor OR usuario = :valor)
-                    AND rol = :rol
+                    WHERE email = :valor OR usuario = :valor
                     LIMIT 1";
 
             $stmt = $db->prepare($sql);
             $stmt->execute([
-                ':valor' => $usuarioOEmail,
-                ':rol'   => $rolSolicitado,
+                ':valor' => $usuarioOEmail
             ]);
 
-            $usuario = $stmt->fetch();
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($usuario && password_verify($password, $usuario['password_hash'])) {
 
@@ -70,38 +66,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['usuario_usuario'] = $usuario['usuario'];
                 $_SESSION['usuario_email']   = $usuario['email'];
                 $_SESSION['usuario_rol']     = $usuario['rol'];
-                // Si vino un "next" válido, redirigir allí (solo rutas internas)
+
+                // Redirección personalizada si viene "next"
                 $postedNext = $_POST['next'] ?? $next;
                 if ($postedNext) {
-                    // Ensure we have a decoded, project-relative path
                     $postedNext = urldecode($postedNext);
                     $lower = strtolower($postedNext);
-                    if (strpos($lower, 'http://') === false && strpos($lower, 'https://') === false && strpos($postedNext, '..') === false) {
+
+                    if (
+                        strpos($lower, 'http://') === false &&
+                        strpos($lower, 'https://') === false &&
+                        strpos($postedNext, '..') === false
+                    ) {
                         redirect($postedNext);
+                        exit;
                     }
                 }
 
-                // Redirigir según rol por defecto
+                // Redirección por rol
                 switch ($usuario['rol']) {
-                    case "administrador":
+                    case 'administrador':
                         redirect('admin');
                         break;
-                    case "bibliotecario":
+                    case 'bibliotecario':
                         redirect('staff');
                         break;
-                    case "estudiante":
+                    default:
                         redirect('student');
-                        break;
                 }
                 exit;
-            } 
-            else {
-                $mensaje = "Credenciales inválidas para el rol seleccionado.";
+
+            } else {
+                $mensaje = "Usuario o contraseña incorrectos.";
                 $tipoMensaje = "error";
             }
 
         } catch (Exception $e) {
-            $mensaje = "Error interno: " . $e->getMessage();
+            $mensaje = "Error interno del sistema.";
             $tipoMensaje = "error";
         }
     }
@@ -118,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 <div class="auth-layout">
 
-    <!-- LADO IZQUIERTO -->
+    <!-- LADO IZQUIERDO -->
     <section class="hero-side">
         <div class="hero-overlay">
             <h2 class="hero-title heading-serif">
@@ -140,13 +141,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </p>
 
             <?php if ($mensaje): ?>
-                <div class="alert <?php echo $tipoMensaje === 'error' ? 'alert-error' : 'alert-success'; ?>">
+                <div class="alert alert-error">
                     <?php echo htmlspecialchars($mensaje); ?>
                 </div>
             <?php endif; ?>
 
             <form method="POST" action="" class="auth-form">
                 <input type="hidden" name="next" value="<?php echo htmlspecialchars($next); ?>">
+
                 <div class="field">
                     <label for="usuario_email">Usuario o correo</label>
                     <input
@@ -154,7 +156,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         id="usuario_email"
                         name="usuario_email"
                         autocomplete="username"
-                        value="<?php echo htmlspecialchars($usuarioOEmail); ?>"
+                        value="<?php echo htmlspecialchars($usuarioOEmail ?? ''); ?>"
+                        required
                     >
                 </div>
 
@@ -165,29 +168,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         id="password"
                         name="password"
                         autocomplete="current-password"
+                        required
                     >
-                </div>
-
-                <div class="field field-select">
-                    <label for="rol">Rol</label>
-                    <select id="rol" name="rol">
-                        <option value="">Seleccione un rol</option>
-
-                        <option value="estudiante"
-                            <?php echo $rolSolicitado === 'estudiante' ? 'selected' : ''; ?>>
-                            Estudiante
-                        </option>
-
-                        <option value="bibliotecario"
-                            <?php echo $rolSolicitado === 'bibliotecario' ? 'selected' : ''; ?>>
-                            Bibliotecario
-                        </option>
-
-                        <option value="administrador"
-                            <?php echo $rolSolicitado === 'administrador' ? 'selected' : ''; ?>>
-                            Administrador
-                        </option>
-                    </select>
                 </div>
 
                 <div class="form-footer">
