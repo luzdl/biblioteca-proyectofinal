@@ -20,6 +20,8 @@ function _sb_url($path) {
 
         <?php if ($_sidebar_rol === 'administrador'): ?>
             <a href="<?php echo htmlspecialchars(_sb_url('app/admin/index.php')); ?>">Panel</a>
+            <a href="<?php echo htmlspecialchars(_sb_url('app/admin/usuarios.php')); ?>">Usuarios</a>
+            <a href="<?php echo htmlspecialchars(_sb_url('app/admin/roles.php')); ?>">Roles</a>
             <a href="<?php echo htmlspecialchars(_sb_url('app/admin/categorias.php')); ?>">Categorías</a>
             <a href="<?php echo htmlspecialchars(_sb_url('app/admin/carreras.php')); ?>">Carreras</a>
         <?php endif; ?>
