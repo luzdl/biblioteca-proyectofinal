@@ -69,9 +69,9 @@ if ($busqueda !== "") {
 
     <nav class="menu">
         <?php if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'estudiante'): ?>
-            <a href="student_only.php" class="active">Catálogo</a>
-            <a href="student_reservas.php">Mis reservas</a>
-            <a href="student_historial.php">Historial</a>
+            <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/catalog.php') : 'student_only.php'); ?>" class="active">Catálogo</a>
+            <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/reservas.php') : 'student_reservas.php'); ?>">Mis reservas</a>
+            <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/historial.php') : 'student_historial.php'); ?>">Historial</a>
         <?php else: ?>
             <a href="catalog.php" class="active">Catálogo</a>
             <a href="login.php" class="login-btn">Iniciar sesión</a>

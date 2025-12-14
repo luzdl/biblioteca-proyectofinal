@@ -10,8 +10,8 @@ if (isset($_SESSION['usuario_usuario']) && $_SESSION['usuario_usuario'] !== ''):
             <?php echo htmlspecialchars($_SESSION['usuario_usuario']); ?> <span class="caret">▾</span>
         </summary>
         <div class="dropdown-menu">
-            <a href="perfil_estudiante.php">Perfil</a>
-            <a href="logout.php" class="logout">Cerrar sesión</a>
+            <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/profile/index.php') : 'perfil_estudiante.php'); ?>">Perfil</a>
+            <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('logout.php') : 'logout.php'); ?>" class="logout">Cerrar sesión</a>
         </div>
     </details>
 </div>
