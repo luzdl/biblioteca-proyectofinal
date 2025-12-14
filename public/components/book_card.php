@@ -5,7 +5,7 @@ $extraHtml = $extraHtml ?? '';
 ?>
 <div class="book-card">
     <div class="book-image">
-        <img src="<?php echo htmlspecialchars($book['imagen'] ?? '../img/placeholder.png'); ?>" alt="Portada">
+        <img src="<?php echo htmlspecialchars($book['imagen'] ?? (function_exists('url_for') ? url_for('img/placeholder.png') : '../img/placeholder.png')); ?>" alt="Portada">
     </div>
 
     <h3 class="book-title"><?php echo htmlspecialchars($book['titulo'] ?? 'Título'); ?></h3>

@@ -1,0 +1,107 @@
+<?php
+
+require_once __DIR__ . '/../config/env.php';
+require_once __DIR__ . '/../config/database.php';
+
+try {
+    $db = (new Database())->getConnection();
+
+    $db->exec("CREATE TABLE IF NOT EXISTS roles (
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        name VARCHAR(50) NOT NULL,
+        description VARCHAR(255) NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_roles_name (name)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
+    $db->exec("INSERT INTO roles (name, description) VALUES
+        ('estudiante', 'Rol para estudiantes'),
+        ('bibliotecario', 'Rol para personal/bibliotecario'),
+        ('administrador', 'Rol administrador')
+        ON DUPLICATE KEY UPDATE description = VALUES(description)");
+
+    $db->exec("CREATE TABLE IF NOT EXISTS usuario_roles (
+        usuario_id INT(11) NOT NULL,
+        role_id INT UNSIGNED NOT NULL,
+        assigned_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (usuario_id, role_id),
+        KEY idx_usuario_roles_role_id (role_id),
+        CONSTRAINT fk_usuario_roles_usuario
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE,
+        CONSTRAINT fk_usuario_roles_role
+            FOREIGN KEY (role_id) REFERENCES roles(id)
+            ON DELETE RESTRICT
+            ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
+    $db->exec("INSERT IGNORE INTO roles (name)
+              SELECT DISTINCT rol FROM usuarios WHERE rol IS NOT NULL AND rol <> ''");
+
+    $db->exec("INSERT IGNORE INTO usuario_roles (usuario_id, role_id)
+              SELECT u.id, r.id
+              FROM usuarios u
+              JOIN roles r ON r.name = u.rol
+              WHERE u.rol IS NOT NULL AND u.rol <> ''");
+
+    $db->exec("CREATE TABLE IF NOT EXISTS uploads (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        usuario_id INT(11) NOT NULL,
+        original_name VARCHAR(255) NOT NULL,
+        stored_name VARCHAR(255) NOT NULL,
+        relative_path VARCHAR(500) NOT NULL,
+        mime_type VARCHAR(100) NOT NULL,
+        size_bytes BIGINT UNSIGNED NOT NULL,
+        sha256 CHAR(64) NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_uploads_usuario_id (usuario_id),
+        CONSTRAINT fk_uploads_usuario
+            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci");
+
+    $hasColumn = $db->query("SELECT COUNT(*) AS c
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'usuarios'
+          AND COLUMN_NAME = 'profile_upload_id'")->fetch();
+
+    if ((int)($hasColumn['c'] ?? 0) === 0) {
+        $db->exec("ALTER TABLE usuarios ADD COLUMN profile_upload_id BIGINT UNSIGNED NULL");
+    }
+
+    $hasIndex = $db->query("SELECT COUNT(*) AS c
+        FROM information_schema.STATISTICS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'usuarios'
+          AND INDEX_NAME = 'idx_usuarios_profile_upload_id'")->fetch();
+
+    if ((int)($hasIndex['c'] ?? 0) === 0) {
+        $db->exec("CREATE INDEX idx_usuarios_profile_upload_id ON usuarios(profile_upload_id)");
+    }
+
+    $hasFk = $db->query("SELECT COUNT(*) AS c
+        FROM information_schema.TABLE_CONSTRAINTS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'usuarios'
+          AND CONSTRAINT_NAME = 'fk_usuarios_profile_upload'
+          AND CONSTRAINT_TYPE = 'FOREIGN KEY'")->fetch();
+
+    if ((int)($hasFk['c'] ?? 0) === 0) {
+        $db->exec("ALTER TABLE usuarios
+                  ADD CONSTRAINT fk_usuarios_profile_upload
+                  FOREIGN KEY (profile_upload_id) REFERENCES uploads(id)
+                  ON DELETE SET NULL
+                  ON UPDATE CASCADE");
+    }
+
+    echo "DB update OK\n";
+} catch (Exception $e) {
+    echo "DB update FAILED: " . $e->getMessage() . "\n";
+    exit(1);
+}
