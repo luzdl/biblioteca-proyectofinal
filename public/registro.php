@@ -89,52 +89,61 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-      .field label.req::after {
+        .field label.req {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px; /* separa el texto del asterisco */
+        }
+
+        .field label.req::after {
         content: " *";
         color: var(--terracotta, #C7764A);
         font-weight: 700;
-      }
-      .is-invalid {
+        letter-spacing: 0 !important;   /* evita separación rara */
+        margin-left: 4px;
+        }
+
+        .is-invalid {
         border-bottom-color: #c0392b !important;
-      }
-      @keyframes shake {
+        }
+        @keyframes shake {
         20%, 60% { transform: translateX(-4px); }
         40%, 80% { transform: translateX(4px); }
-      }
-      .shake { animation: shake 0.4s ease; }
-      .error-hint {
+        }
+        .shake { animation: shake 0.4s ease; }
+        .error-hint {
         font-size: 12px;
         color: #c0392b;
         display: none;
-      }
-      .error-hint.show { display: block; }
-      .field select {
+        }
+        .error-hint.show { display: block; }
+        .field select {
         width: 100%;
         border: none;
         border-bottom: 1px solid rgba(87, 71, 55, 0.45);
         padding: 7px 0 9px;
         background: transparent;
         color: var(--coffee);
-      }
-      .field select:focus {
+        }
+        .field select:focus {
         border-bottom-color: var(--sage);
         outline: none;
-      }
+        }
 
       /* Ajuste de la lista de SweetAlert2 */
-      .swal2-html-container ul {
+        .swal2-html-container ul {
         padding-left: 18px !important; /* acercar bullets */
         margin: 6px 0 !important;
         text-align: left !important;
-      }
-      .swal2-html-container ul li {
+        }
+        .swal2-html-container ul li {
         margin-left: 0 !important;
         padding-left: 4px !important;
-      }
+        }
     </style>
 
     <script>
-      const LABELS = {
+        const LABELS = {
         cip: "CIP / Cédula",
         primer_nombre: "Primer nombre",
         primer_apellido: "Primer apellido",
@@ -144,45 +153,45 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         email: "Correo electrónico",
         password: "Contraseña",
         password2: "Confirmar contraseña"
-      };
+        };
 
-      function setInvalid(input, show = true) {
+        function setInvalid(input, show = true) {
         if (!input) return;
         input.classList.toggle('is-invalid', show);
         const hint = input.closest('.field')?.querySelector('.error-hint');
         if (hint) hint.classList.toggle('show', show);
-      }
+        }
 
-      function clearAllInvalid(ids) {
+        function clearAllInvalid(ids) {
         ids.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) setInvalid(el, false);
+            const el = document.getElementById(id);
+            if (el) setInvalid(el, false);
         });
-      }
+        }
 
-      function validarFormulario(e) {
+        function validarFormulario(e) {
         const card = document.querySelector('.register-card');
 
         const campos = [
-          "cip","primer_nombre","primer_apellido",
-          "fecha_nacimiento","carrera_id","usuario","email",
-          "password","password2"
+            "cip","primer_nombre","primer_apellido",
+            "fecha_nacimiento","carrera_id","usuario","email",
+            "password","password2"
         ];
 
         clearAllInvalid(campos);
 
         const faltantes = [];
         for (let id of campos) {
-          const input = document.getElementById(id);
-          if (!input) continue;
+            const input = document.getElementById(id);
+            if (!input) continue;
 
-          let val = input.value.trim();
-          if (input.tagName.toLowerCase() === 'select') val = input.value;
+            let val = input.value.trim();
+            if (input.tagName.toLowerCase() === 'select') val = input.value;
 
-          if (val === "") {
+            if (val === "") {
             faltantes.push(id);
             setInvalid(input, true);
-          }
+            }
         }
 
         const email = document.getElementById('email')?.value.trim();
@@ -191,50 +200,49 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         let emailInvalido = false;
         if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          emailInvalido = true;
-          setInvalid(document.getElementById('email'), true);
+            emailInvalido = true;
+            setInvalid(document.getElementById('email'), true);
         }
 
         let passNoCoinciden = false;
         if (pass && pass2 && pass !== pass2) {
-          passNoCoinciden = true;
-          setInvalid(document.getElementById('password'), true);
-          setInvalid(document.getElementById('password2'), true);
+            passNoCoinciden = true;
+            setInvalid(document.getElementById('password'), true);
+            setInvalid(document.getElementById('password2'), true);
         }
 
         if (faltantes.length || emailInvalido || passNoCoinciden) {
-          e.preventDefault();
+            e.preventDefault();
 
-          let items = "";
-          
-          if (emailInvalido) items += "<br>Ingresa un correo electrónico válido.";
-          if (passNoCoinciden) items += "<br>Las contraseñas no coinciden.";
+            let items = "";
+            if (emailInvalido) items += "<br>Ingresa un correo electrónico válido.";
+            if (passNoCoinciden) items += "<br>Las contraseñas no coinciden.";
 
-          Swal.fire({
+            Swal.fire({
             icon: 'warning',
             title: 'Faltan campos obligatorios',
             html: items,
             confirmButtonColor: '#C7764A'
-          });
+            });
 
-          card.classList.remove('shake'); void card.offsetWidth;
-          card.classList.add('shake');
+            card.classList.remove('shake'); void card.offsetWidth;
+            card.classList.add('shake');
 
-          return false;
+            return false;
         }
 
         return true;
-      }
+        }
 
-      document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', () => {
         const ids = ["cip","primer_nombre","primer_apellido","fecha_nacimiento","carrera_id","usuario","email","password","password2"];
         ids.forEach(id => {
-          const input = document.getElementById(id);
-          if (!input) return;
-          input.addEventListener('input', () => setInvalid(input, false));
-          input.addEventListener('change', () => setInvalid(input, false));
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.addEventListener('input', () => setInvalid(input, false));
+            input.addEventListener('change', () => setInvalid(input, false));
         });
-      });
+        });
     </script>
 </head>
 <body>
@@ -298,9 +306,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <select id="carrera_id" name="carrera_id">
                         <option value="">Seleccione una carrera</option>
                         <?php foreach ($carreras as $carrera): ?>
-                          <option value="<?php echo $carrera['id']; ?>" <?php echo $formData['carrera_id'] == $carrera['id'] ? 'selected' : ''; ?>>
+                            <option value="<?php echo $carrera['id']; ?>" <?php echo $formData['carrera_id'] == $carrera['id'] ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($carrera['nombre']); ?>
-                          </option>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                     <div class="error-hint">Este campo es obligatorio.</div>
