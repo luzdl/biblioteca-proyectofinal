@@ -6,12 +6,12 @@ function router_routes()
         'home' => 'public/catalog.php',
         'login' => 'public/login.php',
         'register' => 'public/registro.php',
-        'student' => 'public/student_only.php',
-        'student_reservas' => 'public/student_reservas.php',
-        'student_historial' => 'public/student_historial.php',
-        'perfil' => 'public/perfil_estudiante.php',
-        'admin' => 'public/admin_only.php',
-        'staff' => 'public/staff_only.php',
+        'student' => 'public/app/student/catalog.php',
+        'student_reservas' => 'public/app/student/reservas.php',
+        'student_historial' => 'public/app/student/historial.php',
+        'perfil' => 'public/app/profile/index.php',
+        'admin' => 'public/app/admin/index.php',
+        'staff' => 'public/app/staff/index.php',
         'reservar' => 'public/reservar.php',
     ];
 }
@@ -87,4 +87,32 @@ function redirect($nameOrPath, $params = [])
 
     header('Location: ' . $url);
     exit;
+}
+
+function url_for($nameOrPath, $params = [])
+{
+    $target = route($nameOrPath, $params);
+
+    // Prevent open redirects: only allow local paths
+    if (stripos($target, 'http://') === 0 || stripos($target, 'https://') === 0) {
+        $target = route('home');
+    }
+
+    $scheme = (!empty($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http'));
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+    $script = $_SERVER['SCRIPT_NAME'] ?? '/';
+    $pos = strpos($script, '/public');
+    if ($pos !== false) {
+        $projectBase = substr($script, 0, $pos);
+    } else {
+        $projectBase = rtrim(dirname($script), '/');
+    }
+
+    if ($projectBase === '') {
+        $projectBase = '';
+    }
+
+    $path = '/' . ltrim($target, '/');
+    return $scheme . '://' . $host . $projectBase . $path;
 }

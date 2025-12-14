@@ -94,6 +94,55 @@ if ($busqueda !== "") {
                         } else {
                             $extraHtml = '<button class="reserve-btn needs-login" data-id="' . intval($book['id']) . '">Reservar</button>';
                         }
+<body>
+
+<!-- Barra superior -->
+<header class="topbar">
+    <div class="logo">Biblioteca Digital</div>
+
+    <nav class="menu">
+        <?php if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'estudiante'): ?>
+            <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/catalog.php') : 'student_only.php'); ?>" class="active">Catálogo</a>
+            <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/reservas.php') : 'student_reservas.php'); ?>">Mis reservas</a>
+            <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/historial.php') : 'student_historial.php'); ?>">Historial</a>
+        <?php else: ?>
+            <a href="catalog.php" class="active">Catálogo</a>
+            <a href="login.php" class="login-btn">Iniciar sesión</a>
+        <?php endif; ?>
+    </nav>
+
+    <?php include __DIR__ . '/components/topbar_dropdown.php'; ?>
+</header>
+
+
+<div class="container">
+
+    <!-- Buscador -->
+    <form method="GET" class="search-box">
+        <input 
+            type="text" 
+            name="q" 
+            placeholder="Buscar por título, autor o categoría..." 
+            value="<?php echo htmlspecialchars($busqueda); ?>"
+        >
+        <button type="submit">Buscar</button>
+    </form>
+
+    <h2 class="section-title">Libros disponibles</h2>
+
+    <!-- Grid de libros -->
+    <div class="book-grid">
+
+        <?php if (empty($libros)): ?>
+            <p>No se encontraron libros para la búsqueda seleccionada.</p>
+        <?php endif; ?>
+
+        <?php foreach ($libros as $libro): ?>
+            <?php
+                $book = $libro;
+                if ($book['stock'] > 0) {
+                    if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'estudiante') {
+                        $extraHtml = '<a class="reserve-btn" href="reservar.php?id=' . intval($book['id']) . '">Reservar</a>';
                     } else {
                         $extraHtml = '<div class="reserve-disabled">No disponible</div>';
                     }
