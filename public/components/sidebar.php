@@ -1,10 +1,24 @@
 <?php
-// components/sidebar.php
-// Sidebar colapsable con iconos y labels al hacer hover.
-// Asume que se incluye desde /public/*.php
 
-$current  = basename($_SERVER['PHP_SELF'] ?? '');
+$sidebarRole = (string)($_SESSION['usuario_rol'] ?? '');
 $username = htmlspecialchars($_SESSION['usuario_usuario'] ?? '');
+$currentPath = (string)(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '');
+$currentPath = ltrim($currentPath, '/');
+
+function _sb_url(string $path): string
+{
+    if (function_exists('url_for')) {
+        return url_for($path);
+    }
+    return $path;
+}
+
+function _sb_active(string $path): bool
+{
+    $current = (string)($GLOBALS['currentPath'] ?? '');
+    return $current !== '' && str_ends_with($current, ltrim($path, '/'));
+}
+
 ?>
 <style>
   :root{
@@ -144,9 +158,11 @@ $username = htmlspecialchars($_SESSION['usuario_usuario'] ?? '');
   }
 </style>
 
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
 <aside class="sidebar" aria-label="Navegación principal">
   <div class="sidebar-logo">
-    <img src="../img/logo_redondo.png"
+    <img src="<?php echo htmlspecialchars(_sb_url('img/logo_redondo.png')); ?>"
          alt="Logo"
          onerror="this.style.display='none'; this.parentNode.querySelector('.logo-icon').style.display='block'"
          onload="this.parentNode.querySelector('.logo-icon').style.display='none'">
@@ -155,29 +171,85 @@ $username = htmlspecialchars($_SESSION['usuario_usuario'] ?? '');
   </div>
 
   <nav class="sidebar-menu" role="navigation">
-    <a class="menu-link <?php echo $current==='student_only.php'?'active':''; ?>"
-       href="student_only.php"
-       data-tooltip="Catálogo" aria-label="Catálogo">
-      <span class="material-symbols-outlined" aria-hidden="true">local_library</span>
-      <span class="menu-label">Catálogo</span>
-    </a>
 
-    <a class="menu-link <?php echo $current==='student_reservas.php'?'active':''; ?>"
-       href="student_reservas.php"
-       data-tooltip="Mis reservas" aria-label="Mis reservas">
-      <span class="material-symbols-outlined" aria-hidden="true">bookmarks</span>
-      <span class="menu-label">Mis reservas</span>
-    </a>
+    <?php if ($sidebarRole === 'administrador'): ?>
+      <a class="menu-link <?php echo _sb_active('public/app/admin/index.php') || _sb_active('app/admin/index.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/admin/index.php')); ?>"
+         data-tooltip="Panel" aria-label="Panel">
+        <span class="material-symbols-outlined" aria-hidden="true">dashboard</span>
+        <span class="menu-label">Panel</span>
+      </a>
 
-    <a class="menu-link <?php echo $current==='student_historial.php'?'active':''; ?>"
-       href="student_historial.php"
-       data-tooltip="Historial" aria-label="Historial">
-      <span class="material-symbols-outlined" aria-hidden="true">history</span>
-      <span class="menu-label">Historial</span>
-    </a>
+      <a class="menu-link <?php echo _sb_active('public/app/admin/usuarios.php') || _sb_active('app/admin/usuarios.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/admin/usuarios.php')); ?>"
+         data-tooltip="Usuarios" aria-label="Usuarios">
+        <span class="material-symbols-outlined" aria-hidden="true">group</span>
+        <span class="menu-label">Usuarios</span>
+      </a>
 
-    <a class="menu-link <?php echo $current==='perfil_estudiante.php'?'active':''; ?>"
-       href="perfil_estudiante.php"
+      <a class="menu-link <?php echo _sb_active('public/app/admin/roles.php') || _sb_active('app/admin/roles.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/admin/roles.php')); ?>"
+         data-tooltip="Roles" aria-label="Roles">
+        <span class="material-symbols-outlined" aria-hidden="true">admin_panel_settings</span>
+        <span class="menu-label">Roles</span>
+      </a>
+
+      <a class="menu-link <?php echo _sb_active('public/app/admin/categorias.php') || _sb_active('app/admin/categorias.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/admin/categorias.php')); ?>"
+         data-tooltip="Categorías" aria-label="Categorías">
+        <span class="material-symbols-outlined" aria-hidden="true">category</span>
+        <span class="menu-label">Categorías</span>
+      </a>
+
+      <a class="menu-link <?php echo _sb_active('public/app/admin/carreras.php') || _sb_active('app/admin/carreras.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/admin/carreras.php')); ?>"
+         data-tooltip="Carreras" aria-label="Carreras">
+        <span class="material-symbols-outlined" aria-hidden="true">school</span>
+        <span class="menu-label">Carreras</span>
+      </a>
+    <?php endif; ?>
+
+    <?php if ($sidebarRole === 'bibliotecario'): ?>
+      <a class="menu-link <?php echo _sb_active('public/app/staff/index.php') || _sb_active('app/staff/index.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/staff/index.php')); ?>"
+         data-tooltip="Panel" aria-label="Panel">
+        <span class="material-symbols-outlined" aria-hidden="true">dashboard</span>
+        <span class="menu-label">Panel</span>
+      </a>
+
+      <a class="menu-link <?php echo _sb_active('public/app/admin/carreras.php') || _sb_active('app/admin/carreras.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/admin/carreras.php')); ?>"
+         data-tooltip="Carreras" aria-label="Carreras">
+        <span class="material-symbols-outlined" aria-hidden="true">school</span>
+        <span class="menu-label">Carreras</span>
+      </a>
+    <?php endif; ?>
+
+    <?php if ($sidebarRole === 'estudiante'): ?>
+      <a class="menu-link <?php echo _sb_active('public/app/student/catalog.php') || _sb_active('app/student/catalog.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/student/catalog.php')); ?>"
+         data-tooltip="Catálogo" aria-label="Catálogo">
+        <span class="material-symbols-outlined" aria-hidden="true">local_library</span>
+        <span class="menu-label">Catálogo</span>
+      </a>
+
+      <a class="menu-link <?php echo _sb_active('public/app/student/reservas.php') || _sb_active('app/student/reservas.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/student/reservas.php')); ?>"
+         data-tooltip="Mis reservas" aria-label="Mis reservas">
+        <span class="material-symbols-outlined" aria-hidden="true">bookmarks</span>
+        <span class="menu-label">Mis reservas</span>
+      </a>
+
+      <a class="menu-link <?php echo _sb_active('public/app/student/historial.php') || _sb_active('app/student/historial.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/student/historial.php')); ?>"
+         data-tooltip="Historial" aria-label="Historial">
+        <span class="material-symbols-outlined" aria-hidden="true">history</span>
+        <span class="menu-label">Historial</span>
+      </a>
+    <?php endif; ?>
+
+    <a class="menu-link <?php echo _sb_active('public/app/profile/index.php') || _sb_active('app/profile/index.php') ? 'active' : ''; ?>"
+       href="<?php echo htmlspecialchars(_sb_url('app/profile/index.php')); ?>"
        data-tooltip="Perfil" aria-label="Perfil">
       <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
       <span class="menu-label">Perfil</span>
@@ -185,62 +257,15 @@ $username = htmlspecialchars($_SESSION['usuario_usuario'] ?? '');
   </nav>
 
   <div class="sidebar-bottom">
-    <a href="perfil_estudiante.php" class="sidebar-user link-to-profile" aria-label="Ir al perfil">
-      <img src="../img/user_placeholder.png" alt="Usuario"
+    <a href="<?php echo htmlspecialchars(_sb_url('app/profile/index.php')); ?>" class="sidebar-user link-to-profile" aria-label="Ir al perfil">
+      <img src="<?php echo htmlspecialchars(_sb_url('img/user_placeholder.png')); ?>" alt="Usuario"
            onerror="this.style.display='none'; this.parentNode.querySelector('.user-icon').style.display='block'"
            onload="this.parentNode.querySelector('.user-icon').style.display='none'">
       <span class="user-icon material-symbols-outlined" style="display:none" aria-hidden="true">person</span>
       <p><i><?php echo $username; ?></i></p>
-// Sidebar reusable component - expects to be included from files inside /public
-// Shows different menu items depending on user role
-$_sidebar_rol = $_SESSION['usuario_rol'] ?? '';
-$_sidebar_url = function_exists('url_for') ? 'url_for' : null;
-function _sb_url($path) {
-    global $_sidebar_url;
-    return $_sidebar_url ? url_for($path) : $path;
-}
-?>
-<aside class="sidebar">
-
-    <div class="sidebar-logo">
-        <img src="<?php echo htmlspecialchars(_sb_url('img/logo_redondo.png')); ?>" alt="Logo" onerror="this.style.display='none'; this.parentNode.querySelector('.logo-icon').style.display='block'" onload="this.parentNode.querySelector('.logo-icon').style.display='none'">
-        <span class="logo-icon material-symbols-outlined" style="display:none" aria-hidden="true">menu_book</span>
-        <h2>Biblioteca Digital</h2>
-    </div>
-
-    <nav class="sidebar-menu">
-
-        <?php if ($_sidebar_rol === 'administrador'): ?>
-            <a href="<?php echo htmlspecialchars(_sb_url('app/admin/index.php')); ?>">Panel</a>
-            <a href="<?php echo htmlspecialchars(_sb_url('app/admin/usuarios.php')); ?>">Usuarios</a>
-            <a href="<?php echo htmlspecialchars(_sb_url('app/admin/roles.php')); ?>">Roles</a>
-            <a href="<?php echo htmlspecialchars(_sb_url('app/admin/categorias.php')); ?>">Categorías</a>
-            <a href="<?php echo htmlspecialchars(_sb_url('app/admin/carreras.php')); ?>">Carreras</a>
-        <?php endif; ?>
-
-        <?php if ($_sidebar_rol === 'bibliotecario'): ?>
-            <a href="<?php echo htmlspecialchars(_sb_url('app/staff/index.php')); ?>">Panel</a>
-            <a href="<?php echo htmlspecialchars(_sb_url('app/admin/carreras.php')); ?>">Carreras</a>
-        <?php endif; ?>
-
-        <?php if ($_sidebar_rol === 'estudiante'): ?>
-            <a href="<?php echo htmlspecialchars(_sb_url('app/student/catalog.php')); ?>">Catálogo</a>
-            <a href="<?php echo htmlspecialchars(_sb_url('app/student/reservas.php')); ?>">Mis reservas</a>
-            <a href="<?php echo htmlspecialchars(_sb_url('app/student/historial.php')); ?>">Historial</a>
-        <?php endif; ?>
-
-        <a href="<?php echo htmlspecialchars(_sb_url('app/profile/index.php')); ?>">Perfil</a>
-    </nav>
-
-    <a href="<?php echo htmlspecialchars(_sb_url('logout.php')); ?>" class="logout-btn">Cerrar sesión</a>
-
-    <a href="<?php echo htmlspecialchars(_sb_url('app/profile/index.php')); ?>" class="sidebar-user link-to-profile">
-        <img src="<?php echo htmlspecialchars(_sb_url('img/user_placeholder.png')); ?>" alt="Usuario" onerror="this.style.display='none'; this.parentNode.querySelector('.user-icon').style.display='block'" onload="this.parentNode.querySelector('.user-icon').style.display='none'">
-        <span class="user-icon material-symbols-outlined" style="display:none" aria-hidden="true">person</span>
-        <p><i><?php echo htmlspecialchars($_SESSION['usuario_usuario'] ?? ''); ?></i></p>
     </a>
 
-    <a href="logout.php" class="logout-btn" aria-label="Cerrar sesión">
+    <a href="<?php echo htmlspecialchars(_sb_url('logout.php')); ?>" class="logout-btn" aria-label="Cerrar sesión">
       <span class="material-symbols-outlined" aria-hidden="true">logout</span>
       <span class="menu-label">Cerrar sesión</span>
     </a>
