@@ -1,13 +1,6 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/../config/router.php';
-
-/* Verifica que el usuario esté autenticado y que sea estudiante */
-if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'estudiante') {
-    redirect('login');
-}
-
 /* Libros simulados mientras no haya base de datos */
 $libros = [
     [
@@ -44,7 +37,6 @@ $libros = [
     ]
 ];
 
-/* Buscador */
 $busqueda = $_GET["q"] ?? "";
 
 if ($busqueda !== "") {
@@ -62,12 +54,13 @@ if ($busqueda !== "") {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Biblioteca | Estudiante</title>
+    <title>Biblioteca | Catálogo</title>
     <link rel="stylesheet" href="../css/student.css">
+    <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/components/book_card.css">
     <link rel="stylesheet" href="../css/topbar-dropdown.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
-
 <body>
 
 <!-- Barra superior -->
@@ -75,9 +68,14 @@ if ($busqueda !== "") {
     <div class="logo">Biblioteca Digital</div>
 
     <nav class="menu">
-        <a href="student_only.php" class="active">Catálogo</a>
-        <a href="student_reservas.php">Mis reservas</a>
-        <a href="student_historial.php">Historial</a>
+        <?php if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'estudiante'): ?>
+            <a href="student_only.php" class="active">Catálogo</a>
+            <a href="student_reservas.php">Mis reservas</a>
+            <a href="student_historial.php">Historial</a>
+        <?php else: ?>
+            <a href="catalog.php" class="active">Catálogo</a>
+            <a href="login.php" class="login-btn">Iniciar sesión</a>
+        <?php endif; ?>
     </nav>
 
     <?php include __DIR__ . '/components/topbar_dropdown.php'; ?>
@@ -110,7 +108,11 @@ if ($busqueda !== "") {
             <?php
                 $book = $libro;
                 if ($book['stock'] > 0) {
-                    $extraHtml = '<a class="reserve-btn" href="reservar.php?id=' . intval($book['id']) . '">Reservar</a>';
+                    if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'estudiante') {
+                        $extraHtml = '<a class="reserve-btn" href="reservar.php?id=' . intval($book['id']) . '">Reservar</a>';
+                    } else {
+                        $extraHtml = '<button class="reserve-btn needs-login" data-id="' . intval($book['id']) . '">Reservar</button>';
+                    }
                 } else {
                     $extraHtml = '<div class="reserve-disabled">No disponible</div>';
                 }
@@ -121,6 +123,11 @@ if ($busqueda !== "") {
     </div>
 
 </div>
+
+<?php include 'components/modal.php'; ?>
+<script>
+document.addEventListener('DOMContentLoaded', function () { document.querySelectorAll('.needs-login').forEach(function(btn){ btn.addEventListener('click', function(){ var id = this.getAttribute('data-id'); var next = encodeURIComponent('reservar.php?id=' + id); showAppModal({ title: 'Inicia sesión para reservar', body: 'Debes iniciar sesión para poder realizar la reserva. ¿Deseas ir a iniciar sesión o registrarte ahora?', confirmText: 'Ir a iniciar sesión', onConfirm: function(){ window.location.href = 'login.php?next=' + next; } }); }); }); });
+</script>
 
 </body>
 </html>

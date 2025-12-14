@@ -1,9 +1,10 @@
 <?php
 session_start();
 
+require_once __DIR__ . '/../config/router.php';
+
 if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'estudiante') {
-    header("Location: login.php");
-    exit;
+    redirect('login');
 }
 
 $historial = [
@@ -28,31 +29,12 @@ $historial = [
     <title>Historial</title>
     <link rel="stylesheet" href="../css/sidebar.css">
     <link rel="stylesheet" href="../css/student_reservas.css">
+    <link rel="stylesheet" href="../css/components/book_card.css">
 </head>
 
 <body>
 
-<aside class="sidebar">
-
-    <div class="sidebar-logo">
-        <img src="../img/logo_redondo.png" alt="Logo">
-        <h2>ReadOwl</h2>
-    </div>
-
-    <nav class="sidebar-menu">
-        <a href="student_only.php">Catálogo</a>
-        <a href="student_reservas.php">Mis reservas</a>
-        <a href="student_historial.php" class="active">Historial</a>
-        <a href="perfil_estudiante.php">Perfil</a>
-    </nav>
-
-    <a href="logout.php" class="logout-btn">Cerrar sesión</a>
-
-    <div class="sidebar-user">
-        <img src="../img/user_placeholder.png" alt="Usuario">
-        <p><i><?php echo $_SESSION['usuario_usuario']; ?></i></p>
-    </div>
-</aside>
+<?php include 'components/sidebar.php'; ?>
 
 <main class="content">
 
@@ -62,13 +44,15 @@ $historial = [
     <div class="books-row">
 
         <?php foreach ($historial as $h): ?>
-            <div class="book-card">
-                <img src="<?php echo $h['imagen']; ?>" class="book-img">
-
-                <h3 class="book-title"><?php echo $h['titulo']; ?></h3>
-                <p class="author"><?php echo $h['autor']; ?></p>
-                <p class="estado">Fecha: <?php echo $h['fecha']; ?></p>
-            </div>
+            <?php
+                $book = [
+                    'imagen' => $h['imagen'],
+                    'titulo' => $h['titulo'],
+                    'autor'  => $h['autor']
+                ];
+                $extraHtml = '<p class="estado">Fecha: ' . htmlspecialchars($h['fecha']) . '</p>';
+            ?>
+            <?php include __DIR__ . '/components/book_card.php'; ?>
         <?php endforeach; ?>
 
     </div>

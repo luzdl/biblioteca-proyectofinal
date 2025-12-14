@@ -18,6 +18,8 @@ if (ini_get("session.use_cookies")) {
 // Destruir sesión
 session_destroy();
 
-// Redirigir al login
-header('Location: login.php');
-exit;
+require_once __DIR__ . '/../config/router.php';
+
+// Redirigir al catálogo público (home)
+redirect('home');
+

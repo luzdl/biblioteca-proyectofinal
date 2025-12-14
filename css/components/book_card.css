@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+.book-card {
+    width: 260px;
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.book-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.10);
+}
+
+.book-card .book-image img {
+    width: 120px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.book-card .book-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 6px 0;
+}
+
+.book-card .book-author {
+    color: #6f5f4d;
+    margin-bottom: 8px;
+}
+
+.book-card .book-category {
+    font-size: 13px;
+    color: #8b7964;
+    margin-bottom: 10px;
+}
+
+.book-card .reserve-btn,
+.book-card .cancel-btn {
+    display: inline-block;
+    padding: 9px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.book-card .reserve-btn {
+    background: #c7764a;
+    color: #fff;
+}
+
+.book-card .reserve-disabled {
+    color: #b65c4a;
+    font-weight: 700;
+}

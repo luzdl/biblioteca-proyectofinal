@@ -1,0 +1,11 @@
+.topbar .usuario{position:relative;margin-left:12px}
+.topbar details.dropdown{position:relative}
+.topbar summary.username-summary{list-style:none;cursor:pointer;background:transparent;border:0;color:var(--text);font-weight:600;padding:6px 10px;border-radius:6px;display:inline-flex;align-items:center;gap:6px}
+.topbar summary.username-summary::-webkit-details-marker{display:none}
+.topbar .username-summary:focus{outline:2px solid rgba(0,0,0,0.08)}
+.topbar .username-summary .caret{font-size:12px;opacity:.8}
+.topbar .dropdown-menu{position:absolute;right:0;top:calc(100% + 8px);background:var(--card-bg,#fff);box-shadow:0 6px 16px rgba(0,0,0,0.08);border-radius:8px;min-width:160px;display:none;flex-direction:column;z-index:60;padding:6px 0}
+.topbar .dropdown-menu a{display:block;padding:8px 12px;color:var(--text);text-decoration:none}
+.topbar .dropdown-menu a:hover{background:rgba(0,0,0,0.03)}
+details.dropdown[open] .dropdown-menu{display:flex}
+@media (max-width:600px){.topbar .menu{display:none}.topbar .usuario{margin-left:auto}}

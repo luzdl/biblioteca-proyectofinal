@@ -1,0 +1,48 @@
+:root{
+  --rose:       #D38F7A;
+  --mustard:    #B99145;
+  --coffee:     #574737;
+  --sage:       #A5AF89;
+  --terracotta: #C7764A;
+  --blush:      #E6C8B1;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+
+
+/* Modal component styles - respects existing palette */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(87,71,55,0.45); /* softened coffee */
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+.modal-overlay.active{display:flex}
+
+.modal-card{
+  width:clamp(280px,40vw,540px);
+  background:linear-gradient(180deg,var(--blush),#fff);
+  border:1px solid rgba(87,71,55,0.08);
+  box-shadow:0 10px 30px rgba(87,71,55,0.12);
+  border-radius:10px;
+  padding:20px;
+  color:var(--coffee);
+}
+.modal-header{display:flex;align-items:center;gap:12px}
+.modal-title{font-size:1.1rem;font-weight:700;margin:0}
+.modal-body{margin-top:12px;font-size:0.95rem}
+.modal-actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
+.btn-modal{
+  padding:8px 14px;border-radius:8px;border:1px solid transparent;cursor:pointer;font-weight:600
+}
+.btn-modal.primary{
+  background:var(--terracotta);color:white;border-color:rgba(0,0,0,0.06)
+}
+.btn-modal.ghost{
+  background:transparent;color:var(--coffee);border:1px solid rgba(87,71,55,0.08)
+}

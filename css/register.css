@@ -1,5 +1,5 @@
-/* TIPOGRAFÍAS IGUALES AL LOGIN */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
+/* TIPOGRAFÍA UNIFICADA */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
 /* PALETA */
 :root {
@@ -22,7 +22,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Inter', sans-serif;
   color: var(--coffee);
 
   /* SI la imagen está en /img/inicio.png relativo a este CSS: */
@@ -56,8 +56,8 @@ body {
 
 /* TITULOS ELEGANTES */
 .heading-serif {
-  font-family: "Cormorant Garamond", "Times New Roman", serif;
-  letter-spacing: 0.22em;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 

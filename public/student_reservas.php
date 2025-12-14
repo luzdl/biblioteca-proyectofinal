@@ -1,9 +1,10 @@
 <?php
 session_start();
 
+require_once __DIR__ . '/../config/router.php';
+
 if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'estudiante') {
-    header("Location: login.php");
-    exit;
+    redirect('login');
 }
 
 $reservas = [
@@ -37,31 +38,12 @@ $reservas = [
     <title>Mis reservas</title>
     <link rel="stylesheet" href="../css/sidebar.css">
     <link rel="stylesheet" href="../css/student_reservas.css">
+    <link rel="stylesheet" href="../css/components/book_card.css">
 </head>
 
 <body>
 
-<aside class="sidebar">
-
-    <div class="sidebar-logo">
-        <img src="../img/logo_redondo.png" alt="Logo">
-        <h2>ReadOwl</h2>
-    </div>
-
-    <nav class="sidebar-menu">
-        <a href="student_only.php">Catálogo</a>
-        <a href="student_reservas.php" class="active">Mis reservas</a>
-        <a href="student_historial.php">Historial</a>
-        <a href="perfil_estudiante.php">Perfil</a>
-    </nav>
-
-    <a href="logout.php" class="logout-btn">Cerrar sesión</a>
-
-    <div class="sidebar-user">
-        <img src="../img/user_placeholder.png" alt="Usuario">
-        <p><i><?php echo htmlspecialchars($_SESSION['usuario_usuario']); ?></i></p>
-    </div>
-</aside>
+<?php include 'components/sidebar.php'; ?>
 
 <main class="content">
 
@@ -73,25 +55,16 @@ $reservas = [
         <div class="books-row">
 
             <?php foreach ($reservas as $reserva): ?>
-                <div class="book-card">
-
-                    <img src="<?php echo $reserva['imagen']; ?>" 
-                         class="book-img" alt="Portada">
-
-                    <h3 class="book-title"><?php echo $reserva['titulo']; ?></h3>
-
-                    <p class="author"><?php echo $reserva['autor']; ?></p>
-
-                    <p class="estado estado-<?php echo strtolower(str_replace(' ', '', $reserva['estado'])); ?>">
-                        <?php echo $reserva['estado']; ?>
-                    </p>
-
-                    <a href="cancelar_reserva.php?id=<?php echo $reserva['id']; ?>"
-                       class="cancel-btn">
-                       Cancelar reserva
-                    </a>
-
-                </div>
+                <?php
+                    $book = [
+                        'imagen' => $reserva['imagen'],
+                        'titulo' => $reserva['titulo'],
+                        'autor'  => $reserva['autor']
+                    ];
+                    $extraHtml = '<p class="estado estado-' . strtolower(str_replace(' ', '', $reserva['estado'])) . '">' . htmlspecialchars($reserva['estado']) . '</p>';
+                    $extraHtml .= '<a href="cancelar_reserva.php?id=' . intval($reserva['id']) . '" class="cancel-btn">Cancelar reserva</a>';
+                ?>
+                <?php include __DIR__ . '/components/book_card.php'; ?>
             <?php endforeach; ?>
 
         </div>

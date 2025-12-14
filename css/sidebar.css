@@ -2,61 +2,77 @@
    SIDEBAR PREMIUM TONOS TIERRA
    ========================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 260px;
+    width: 240px;
     height: 100vh;
     background: #f5eee4;
-    border-right: 2px solid #e0d3c2;
-    padding: 25px 20px;
+    border-right: 1px solid #e0d3c2;
+    padding: 14px 12px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 3px 0 10px rgba(0,0,0,0.05);
+    justify-content: flex-start;
+    box-shadow: 3px 0 8px rgba(0,0,0,0.04);
+    font-family: "Inter", sans-serif;
 }
 
 /* Logo */
 .sidebar-logo {
-    text-align: center;
-    margin-bottom: 30px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    padding:10px 0;
+    border-bottom:1px solid #eee;
+    margin-bottom: 12px;
 }
 
+.material-symbols-outlined{font-variation-settings:"FILL" 0, "wght" 400, "GRAD" 0; font-size:28px; color:var(--coffee);}
+
 .sidebar-logo img {
-    width: 85px;
-    height: 85px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     object-fit: cover;
+    border: 2px solid #d6bfa5;
 }
 
 .sidebar-logo h2 {
-    font-size: 24px;
-    margin-top: 10px;
+    font-size: 18px;
+    margin: 0;
     color: #7a5c3a;
     font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: none;
 }
 
 /* Menú */
 .sidebar-menu {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .sidebar-menu a {
-    padding: 12px 18px;
-    font-size: 16px;
+    padding: 8px 12px;
+    font-size: 15px;
     text-decoration: none;
     color: #4e3b26;
-    border-radius: 10px;
-    transition: 0.25s ease;
+    border-radius: 8px;
+    transition: 0.20s ease;
+    font-family: 'Inter', sans-serif;
 }
 
 .sidebar-menu a:hover {
     background: #e8d9c7;
     color: #3a2b1b;
-    transform: translateX(6px);
+    transform: translateX(4px);
 }
 
 .sidebar-menu .active {
@@ -67,15 +83,16 @@
 
 /* Botón cerrar sesión */
 .logout-btn {
-    margin-top: 20px;
-    padding: 12px;
+    margin-top: 12px;
+    padding: 8px 10px;
     text-align: center;
-    border-radius: 10px;
+    border-radius: 8px;
     background: #e7b6b1;
     color: #7a2f2f;
-    font-weight: bold;
+    font-weight: 700;
     text-decoration: none;
-    transition: 0.25s;
+    transition: 0.18s;
+    font-family: 'Inter', sans-serif;
 }
 
 .logout-btn:hover {
@@ -83,21 +100,67 @@
 }
 
 /* Usuario inferior */
+
+/* push user block to bottom */
 .sidebar-user {
     text-align: center;
-    margin-top: 20px;
+    margin-top: auto;
+    padding-bottom: 8px;
 }
 
+
 .sidebar-user img {
-    width: 55px;
-    height: 55px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+    border: 2px solid #e4d7c7;
 }
+
+.sidebar-user .user-icon{font-size:36px;color:var(--coffee);margin-bottom:8px}
 
 .sidebar-user p {
     font-size: 15px;
     color: #6b4e31;
     font-style: italic;
+}
+
+/* If the user block is a link, remove default link styles and keep visual parity */
+.sidebar-user.link-to-profile,
+.sidebar-user.link-to-profile:link,
+.sidebar-user.link-to-profile:visited,
+.sidebar-user.link-to-profile:hover,
+.sidebar-user.link-to-profile:active {
+    color: inherit;
+    text-decoration: none;
+}
+
+.sidebar-user.link-to-profile img,
+.sidebar-user.link-to-profile .user-icon {
+    display: inline-block;
+}
+
+/* Stronger rules to override global link styles that may apply */
+.sidebar a.sidebar-user.link-to-profile,
+.sidebar a.sidebar-user.link-to-profile:link,
+.sidebar a.sidebar-user.link-to-profile:visited,
+.sidebar a.sidebar-user.link-to-profile:hover,
+.sidebar a.sidebar-user.link-to-profile:active {
+    color: inherit !important;
+    text-decoration: none !important;
+    background: transparent !important;
+}
+
+.sidebar a.sidebar-user.link-to-profile img,
+.sidebar a.sidebar-user.link-to-profile .user-icon,
+.sidebar a.sidebar-user.link-to-profile p,
+.sidebar a.sidebar-user.link-to-profile p i {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+
+/* ensure material icon keeps the sidebar color */
+.sidebar a.sidebar-user.link-to-profile .user-icon {
+    color: var(--coffee) !important;
 }

@@ -1,9 +1,10 @@
 <?php
 session_start();
 
+require_once __DIR__ . '/../config/router.php';
+
 if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'estudiante') {
-    header("Location: login.php");
-    exit;
+    redirect('login');
 }
 
 $usuario = [
@@ -19,32 +20,12 @@ $usuario = [
     <title>Mi perfil</title>
     <link rel="stylesheet" href="../css/sidebar.css">
     <link rel="stylesheet" href="../css/student_reservas.css">
+        <link rel="stylesheet" href="../css/student_reservas.css">
 </head>
 
 <body>
 
-<aside class="sidebar">
-
-    <div class="sidebar-logo">
-        <img src="../img/logo_redondo.png" alt="Logo">
-        <h2>ReadOwl</h2>
-    </div>
-
-    <nav class="sidebar-menu">
-        <a href="student_only.php">Catálogo</a>
-        <a href="student_reservas.php">Mis reservas</a>
-        <a href="student_historial.php">Historial</a>
-        <a href="perfil_estudiante.php" class="active">Perfil</a>
-    </nav>
-
-    <a href="logout.php" class="logout-btn">Cerrar sesión</a>
-
-    <div class="sidebar-user">
-        <img src="../img/user_placeholder.png" alt="Usuario">
-        <p><i><?php echo $usuario['nombre']; ?></i></p>
-    </div>
-
-</aside>
+<?php include 'components/sidebar.php'; ?>
 
 <main class="content">
     <h1 class="title">Mi perfil</h1>

@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../config/env.php';
+
 session_start();
+
+require_once __DIR__ . '/../config/router.php';
 
 require_once __DIR__ . '/../config/database.php';
 
@@ -10,16 +13,21 @@ $tipoMensaje = ""; // "error" o "exito"
 $usuarioOEmail = $_POST["usuario_email"] ?? "";
 $rolSolicitado = $_POST["rol"] ?? "";
 
+// Parámetro que indica a dónde redirigir tras login (p. ej. reservar.php?id=2)
+$next = '';
+if (isset($_REQUEST['next'])) {
+    $next = $_REQUEST['next'];
+}
+
 // Si ya está logueado, redirigir según rol
 if (isset($_SESSION['usuario_id'])) {
     if ($_SESSION['usuario_rol'] === "administrador") {
-        header("Location: admin_only.php");
+        redirect('admin');
     } elseif ($_SESSION['usuario_rol'] === "bibliotecario") {
-        header("Location: staff_only.php");
+        redirect('staff');
     } else {
-        header("Location: student_only.php");
+        redirect('student');
     }
-    exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -62,17 +70,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['usuario_usuario'] = $usuario['usuario'];
                 $_SESSION['usuario_email']   = $usuario['email'];
                 $_SESSION['usuario_rol']     = $usuario['rol'];
+                // Si vino un "next" válido, redirigir allí (solo rutas internas)
+                $postedNext = $_POST['next'] ?? $next;
+                if ($postedNext) {
+                    // Ensure we have a decoded, project-relative path
+                    $postedNext = urldecode($postedNext);
+                    $lower = strtolower($postedNext);
+                    if (strpos($lower, 'http://') === false && strpos($lower, 'https://') === false && strpos($postedNext, '..') === false) {
+                        redirect($postedNext);
+                    }
+                }
 
-                // Redirigir según rol
+                // Redirigir según rol por defecto
                 switch ($usuario['rol']) {
                     case "administrador":
-                        header("Location: admin_only.php");
+                        redirect('admin');
                         break;
                     case "bibliotecario":
-                        header("Location: staff_only.php");
+                        redirect('staff');
                         break;
                     case "estudiante":
-                        header("Location: student_only.php");
+                        redirect('student');
                         break;
                 }
                 exit;
@@ -95,6 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <title>Iniciar sesión | Biblioteca Digital</title>
     <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="../css/components.css">
 </head>
 <body>
 <div class="auth-layout">
@@ -127,6 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <?php endif; ?>
 
             <form method="POST" action="" class="auth-form">
+                <input type="hidden" name="next" value="<?php echo htmlspecialchars($next); ?>">
                 <div class="field">
                     <label for="usuario_email">Usuario o correo</label>
                     <input

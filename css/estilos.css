@@ -1,9 +1,11 @@
 /* RESET GENERAL */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Segoe UI", sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 body {
@@ -30,8 +32,10 @@ body {
 
 .topbar .logo {
     font-size: 22px;
-    font-weight: bold;
+    font-weight: 700;
     color: #c48d39;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.06em;
 }
 
 .topbar .menu {

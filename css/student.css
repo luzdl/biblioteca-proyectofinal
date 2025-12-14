@@ -1,6 +1,7 @@
 /* -----------------------------------------
-   ESTILO GENERAL
+    ESTILO GENERAL
 ----------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
 /* ===== SIDEBAR GENERAL ===== */
 
@@ -104,6 +105,17 @@ body {
     background: #f4f1ea;
     font-family: 'Inter', sans-serif;
     color: #3f2f1d;
+}
+
+/* Ensure header logo uses same typography as auth/register */
+.topbar .logo {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.title, .section-title {
+    font-family: 'Inter', sans-serif;
 }
 
 /* -----------------------------------------
