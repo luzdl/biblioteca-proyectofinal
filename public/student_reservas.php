@@ -2,34 +2,35 @@
 session_start();
 
 require_once __DIR__ . '/../config/router.php';
+require_once __DIR__ . '/../config/database.php';
 
-if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'estudiante') {
+if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'estudiante') {
     redirect('login');
+    exit;
 }
 
-$reservas = [
-    [
-        "id" => 1,
-        "titulo" => "Cien años de soledad",
-        "autor" => "García Márquez",
-        "estado" => "En curso",
-        "imagen" => "../img/libro1.jpg"
-    ],
-    [
-        "id" => 2,
-        "titulo" => "El Señor de los Anillos",
-        "autor" => "J.R.R. Tolkien",
-        "estado" => "Pendiente",
-        "imagen" => "../img/libro_lotr.jpg"
-    ],
-    [
-        "id" => 3,
-        "titulo" => "1984",
-        "autor" => "George Orwell",
-        "estado" => "Finalizado",
-        "imagen" => "../img/libro_1984.jpg"
-    ]
-];
+$db = (new Database())->getConnection();
+
+/*
+ * Obtener reservas reales del estudiante logueado
+ */
+$sql = "SELECT 
+            r.id,
+            l.titulo,
+            l.autor,
+            r.estado,
+            l.imagen
+        FROM reservas r
+        JOIN libros l ON l.id = r.libro_id
+        WHERE r.usuario_id = :usuario_id
+        ORDER BY r.created_at DESC";
+
+$stmt = $db->prepare($sql);
+$stmt->execute([
+    ':usuario_id' => $_SESSION['usuario_id']
+]);
+
+$reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -54,18 +55,35 @@ $reservas = [
 
         <div class="books-row">
 
-            <?php foreach ($reservas as $reserva): ?>
-                <?php
-                    $book = [
-                        'imagen' => $reserva['imagen'],
-                        'titulo' => $reserva['titulo'],
-                        'autor'  => $reserva['autor']
-                    ];
-                    $extraHtml = '<p class="estado estado-' . strtolower(str_replace(' ', '', $reserva['estado'])) . '">' . htmlspecialchars($reserva['estado']) . '</p>';
-                    $extraHtml .= '<a href="cancelar_reserva.php?id=' . intval($reserva['id']) . '" class="cancel-btn">Cancelar reserva</a>';
-                ?>
-                <?php include __DIR__ . '/components/book_card.php'; ?>
-            <?php endforeach; ?>
+            <?php if (empty($reservas)): ?>
+                <p class="empty-message">
+                    Aún no has reservado ningún libro 📚
+                </p>
+            <?php else: ?>
+
+                <?php foreach ($reservas as $reserva): ?>
+                    <?php
+                        $book = [
+                            'imagen' => $reserva['imagen'],
+                            'titulo' => $reserva['titulo'],
+                            'autor'  => $reserva['autor']
+                        ];
+
+                        $estadoClase = strtolower(str_replace(' ', '', $reserva['estado']));
+
+                        $extraHtml  = '<p class="estado estado-' . $estadoClase . '">';
+                        $extraHtml .= htmlspecialchars($reserva['estado']) . '</p>';
+
+                        if ($reserva['estado'] !== 'cancelada') {
+                            $extraHtml .= '<a href="cancelar_reserva.php?id='
+                                . intval($reserva['id']) .
+                                '" class="cancel-btn">Cancelar reserva</a>';
+                        }
+                    ?>
+                    <?php include __DIR__ . '/components/book_card.php'; ?>
+                <?php endforeach; ?>
+
+            <?php endif; ?>
 
         </div>
 
