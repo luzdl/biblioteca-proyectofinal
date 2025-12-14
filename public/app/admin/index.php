@@ -18,6 +18,14 @@ require_role(['administrador']);
     <h1 class="title">Panel de administrador</h1>
 
     <section class="dashboard-cards">
+        <a href="<?php echo htmlspecialchars(url_for('app/admin/usuarios.php')); ?>" class="dashboard-card">
+            <h3>Usuarios</h3>
+            <p>Gestionar usuarios del sistema</p>
+        </a>
+        <a href="<?php echo htmlspecialchars(url_for('app/admin/roles.php')); ?>" class="dashboard-card">
+            <h3>Roles</h3>
+            <p>Gestionar roles y permisos</p>
+        </a>
         <a href="<?php echo htmlspecialchars(url_for('app/admin/categorias.php')); ?>" class="dashboard-card">
             <h3>Categorías</h3>
             <p>Gestionar categorías de libros</p>
