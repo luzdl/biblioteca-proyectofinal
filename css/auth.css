@@ -1,28 +1,37 @@
-/* TIPOGRAFÍA UNIFICADA */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+/* ============================
+   TIPOGRAFÍAS (ELEGANT)
+============================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-/* PALETA BASADA EN LA QUE ME PASASTE */
+/* ============================
+   PALETA
+============================ */
 :root {
   --rose:       #D38F7A;
   --mustard:    #B99145;
   --coffee:     #574737;
   --sage:       #A5AF89;
   --terracotta: #C7764A;
-  --blush:      #E6C8B1; /* beige rosado principal */
+  --blush:      #E6C8B1;
+  --input-bg:   rgba(255,255,255,0.45);
+  --input-border: rgba(87, 71, 55, 0.28);
+  --input-focus: #C7764A;
 }
 
-/* RESET BÁSICO */
+/* RESET */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-/* FONDO BEIGE CON DEGRADADOS SUAVES */
+/* ============================
+   FONDO GENERAL
+============================ */
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: 'Inter', sans-serif;
+  font-family: "DM Sans", sans-serif;
   color: var(--coffee);
 
   background:
@@ -31,134 +40,133 @@ body {
     linear-gradient(135deg, #f7ecdf, var(--blush));
 }
 
-/* ---------- LAYOUT GENERAL ---------- */
-
-/* grid: izquierda = hero, derecha = formulario */
+/* ============================
+   LAYOUT
+============================ */
 .auth-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   min-height: 100vh;
 }
 
-/* lado izquierdo (logo / texto) */
+/* ----------------------------
+   LADO IZQUIERDO
+---------------------------- */
 .hero-side {
   position: relative;
-  background: transparent;
 }
 
-/* logo pegado a la ESQUINA INFERIOR IZQUIERDA */
 .hero-overlay {
   position: absolute;
-  left: 40px;      /* distancia al borde izquierdo */
-  bottom: 40px;    /* si lo quieres arriba, cambia por top: 40px; */
+  left: 40px;
+  bottom: 40px;
   max-width: 420px;
-  margin: 0;
-  color: var(--coffee);
 }
 
-
-
 .hero-title {
-  font-size: 34px;
-  line-height: 1.1;
-  margin: 0 0 10px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 42px;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
 }
 
 .hero-text {
-  margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   opacity: 0.8;
 }
 
-/* LADO DERECHO: FORMULARIO */
-
+/* ----------------------------
+   LADO DERECHO (FORM)
+---------------------------- */
 .form-side {
-  grid-column: 2;              /* sigue en la columna derecha */
   display: flex;
   align-items: center;
-  justify-content: flex-end;   /* 👈 AHORA LO EMPUJA HACIA LA DERECHA */
-  padding: 48px 80px;          /* padding igual a ambos lados */
-  background: transparent;
+  justify-content: flex-end;
+  padding: 48px 80px;
 }
-
 
 .form-wrapper {
   width: 100%;
-  max-width: 460px;            /* tamaño del formulario */
+  max-width: 450px;
 }
 
-
-/* ESTILO "ELEGANT" PARA TÍTULOS */
-
+/* ============================
+   TITULOS PREMIUM
+============================ */
 .heading-serif {
-  /* mantener la clase por compatibilidad pero usar la misma tipografía */
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.08em;
+  font-family: "Cormorant Garamond", serif;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
 }
 
 .overline {
   font-size: 11px;
-  margin: 0 0 6px;
-  color: rgba(87, 71, 55, 0.72);
+  opacity: 0.7;
 }
 
 .main-title {
-  font-size: 28px;
-  letter-spacing: 0.12em;
-  margin: 0 0 6px;
+  font-size: 32px;
+  letter-spacing: 0.15em;
+  margin: 5px 0 10px;
 }
 
 .subtitle {
-  margin: 0 0 24px;
-  font-size: 13px;
-  color: rgba(87, 71, 55, 0.8);
+  font-size: 14px;
+  opacity: 0.8;
+  margin-bottom: 25px;
 }
 
-/* FORMULARIO TIPO CONTACTO (LÍNEA ABAJO) */
-
-.auth-form {
-  margin-bottom: 16px;
-}
-
+/* ============================
+   FORMULARIO — INPUTS BONITOS
+============================ */
 .field {
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 .field label {
   display: block;
   font-size: 11px;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  margin-bottom: 4px;
-  color: rgba(87, 71, 55, 0.7);
+  margin-bottom: 6px;
+  opacity: 0.7;
+  font-weight: 500;
 }
 
+/* -------- INPUT BONITOS -------- */
 .field input,
 .field select {
   width: 100%;
-  border: none;
-  border-bottom: 1px solid rgba(87, 71, 55, 0.35);
-  padding: 7px 0 10px;
-  font-size: 16px;
-  background: transparent;
+  padding: 14px 16px;
+  font-size: 15px;
+
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+
+  font-family: "DM Sans", sans-serif;
   color: var(--coffee);
+
+  transition: all 0.25s ease;
+  backdrop-filter: blur(4px);
 }
 
-/* quitar el estilo feo del select nativo */
-.field select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+/* HOVER */
+.field input:hover,
+.field select:hover {
+  border-color: rgba(87,71,55,0.40);
 }
 
-/* foco bonito */
+/* FOCUS */
 .field input:focus,
 .field select:focus {
   outline: none;
-  border-bottom-color: var(--terracotta);
+  border-color: var(--input-focus);
+  background: rgba(255,255,255,0.65);
+  box-shadow: 0 0 0 3px rgba(199,118,74,0.20);
 }
 
+/* ICONO DE SELECT */
 .field-select {
   position: relative;
 }
@@ -166,50 +174,52 @@ body {
 .field-select::after {
   content: "▾";
   position: absolute;
-  right: 0;
-  bottom: 12px;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: rgba(87, 71, 55, 0.7);
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  opacity: 0.6;
   pointer-events: none;
 }
 
-
-/* BOTÓN */
-
-.form-footer {
-  margin-top: 10px;
-}
-
+/* ============================
+   BOTÓN REDONDO PREMIUM
+============================ */
 .btn-primary {
-  display: inline-block;
   border: none;
   background: var(--terracotta);
-  color: #fdfaf7;
-  padding: 9px 24px;
+  color: #fff;
+  padding: 12px 26px;
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.18em;
+  font-family: "DM Sans", sans-serif;
   cursor: pointer;
+
   border-radius: 999px;
+  transition: 0.25s ease;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
+  transform: translateY(-1px);
+  background: #b2653e;
 }
 
-/* MENSAJES */
-
+/* ============================
+   MENSAJES
+============================ */
 .alert {
   font-size: 13px;
-  padding: 8px 10px;
-  margin-bottom: 14px;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 16px;
 }
 
 .alert-error {
   background: #ffe5e5;
-  color: #8c1010;
+  color: #9a1f1f;
 }
 
 .alert-success {
@@ -217,29 +227,30 @@ body {
   color: #135e34;
 }
 
-/* TEXTO INFERIOR */
-
+/* ============================
+   FOOTER
+============================ */
 .small-text {
   font-size: 12px;
-  color: rgba(87, 71, 55, 0.8);
+  opacity: 0.8;
 }
 
 .small-text a {
   color: var(--rose);
-  text-decoration: none;
 }
 
 .small-text a:hover {
   text-decoration: underline;
 }
 
-/* RESPONSIVE PARA CELULAR */
-
+/* ============================
+   RESPONSIVE
+============================ */
 @media (max-width: 900px) {
   .auth-layout {
     grid-template-columns: 1fr;
   }
   .hero-side {
-    display: none; /* si quieres ver tu arte en mobile, quita esta línea */
+    display: none;
   }
 }
