@@ -3,306 +3,142 @@
 ----------------------------------------- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
-/* ===== SIDEBAR GENERAL ===== */
-
-.sidebar {
-    width: 260px;
-    height: 100vh;
-    background: #faf5ef;
-    border-right: 2px solid #e4d7c7;
-    padding: 30px 20px;
-    position: fixed;
-    top: 0; left: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    font-family: "Inter", sans-serif;
+:root{
+  /* paleta base */
+  --bg-page: #f4f1ea;   /* color de fondo del sitio */
+  --text-main: #3f2f1d;
+  --muted: #6e6458;
+  --accent: #b78a5f;
+  --button: #c79d6e;
+  --card-bg: #ffffff;
+  --border-soft: #e4d9cc;
 }
 
-/* LOGO SUPERIOR */
-.sidebar-logo {
-    text-align: center;
+/* ====== FONDO A PANTALLA COMPLETA, SIN FRANJAS BLANCAS ====== */
+html, body{
+  margin:0; padding:0;
+  width:100%;
+  min-height:100vh;
+  background: var(--bg-page) !important;
+  color: var(--text-main);
+  font-family:'Inter', sans-serif;
+  overflow-x:hidden !important; /* evita scroll horizontal */
 }
 
-.sidebar-logo img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    margin-bottom: 8px;
-    object-fit: cover;
-    border: 3px solid #d6bfa5;
+/* Cuando existe sidebar (lo añade el componente al <body>) */
+body.has-sidebar{
+  padding-left: 276px !important; /* 260 ancho + margen de respiro */
+  padding-top: 16px;
+  background: var(--bg-page) !important;
 }
-
-.sidebar-logo h2 {
-    font-size: 22px;
-    font-weight: 700;
-    color: #b68c5a;
-    margin: 0;
-}
-
-/* MENÚ PRINCIPAL */
-.sidebar-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 30px;
-}
-
-.sidebar-menu a {
-    text-decoration: none;
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: 16px;
-    color: #5d4a3f;
-    transition: 0.3s ease;
-}
-
-/* HOVER */
-.sidebar-menu a:hover {
-    background: #e8d8c8;
-    color: #3c2d24;
-    padding-left: 22px;
-}
-
-/* BOTÓN CERRAR SESIÓN */
-.logout-btn {
-    margin-top: 20px;
-    text-decoration: none;
-    color: #c44b4b;
-    padding: 12px 16px;
-    font-weight: 500;
-    border-radius: 8px;
-    transition: 0.3s;
-}
-
-.logout-btn:hover {
-    background: #f5d2d2;
-    padding-left: 22px;
-}
-
-/* USUARIO INFERIOR */
-.sidebar-user {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.sidebar-user img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    margin-bottom: 5px;
-    object-fit: cover;
-}
-
-.sidebar-user p {
-    color: #7a5f46;
-    font-size: 15px;
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    background: #f4f1ea;
-    font-family: 'Inter', sans-serif;
-    color: #3f2f1d;
-}
-
-/* Ensure header logo uses same typography as auth/register */
-.topbar .logo {
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-}
-
-.title, .section-title {
-    font-family: 'Inter', sans-serif;
+@media (max-width: 900px){
+  body.has-sidebar{ padding-left: 88px !important; }
 }
 
 /* -----------------------------------------
-   NAV SUPERIOR
+   NAV SUPERIOR (se mantiene)
 ----------------------------------------- */
 .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 90px;
-    background: #ffffff;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.08);
+  display:flex; justify-content:space-between; align-items:center;
+  padding: 18px 90px;
+  background:#fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  position: sticky; top:0; z-index:50; /* queda sobre el sidebar */
 }
-
-.logo {
-    font-size: 28px;
-    font-weight: 700;
-    color: #3f2f1d;
+.topbar .logo {
+  font-family:'Inter', sans-serif;
+  font-weight:700; letter-spacing:.06em;
+  font-size:28px; color: var(--text-main);
 }
-
 .menu a {
-    text-decoration: none;
-    margin: 0 18px;
-    font-size: 17px;
-    color: #6e6458;
-    padding-bottom: 4px;
-    transition: 0.3s;
+  text-decoration:none; margin:0 18px; font-size:17px;
+  color: var(--muted); padding-bottom:4px; transition:.3s;
 }
-
-.menu a:hover {
-    color: #b78a5f;
-}
-
+.menu a:hover { color: var(--accent); }
 .menu .active {
-    color: #b78a5f;
-    font-weight: 600;
-    border-bottom: 2px solid #b78a5f;
+  color: var(--accent); font-weight:600; border-bottom:2px solid var(--accent);
 }
-
-.usuario {
-    font-weight: 600;
-    color: #3f2f1d;
-}
+.usuario { font-weight:600; color: var(--text-main); }
 
 /* -----------------------------------------
    BUSCADOR
 ----------------------------------------- */
 .search-box {
-    display: flex;
-    justify-content: center;
-    margin: 28px 0;
+  display:flex; justify-content:center; margin:28px 0;
 }
-
 .search-box input {
-    width: 520px;
-    padding: 14px 20px;
-    border-radius: 14px;
-    border: 2px solid #e4d9cc;
-    outline: none;
-    background: #ffffff;
-    font-size: 16px;
-    color: #3f2f1d;
-    transition: 0.3s;
+  width:520px; padding:14px 20px; border-radius:14px;
+  border:2px solid var(--border-soft); outline:none; background:#fff;
+  font-size:16px; color: var(--text-main); transition:.3s;
 }
-
-.search-box input:focus {
-    border-color: #b78a5f;
-}
-
+.search-box input:focus { border-color: var(--accent); }
 .search-box button {
-    margin-left: 12px;
-    padding: 14px 26px;
-    background: #c79d6e;
-    border: none;
-    border-radius: 14px;
-    color: #fff;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 600;
-    transition: 0.25s;
+  margin-left:12px; padding:14px 26px; background: var(--button);
+  border:none; border-radius:14px; color:#fff; cursor:pointer;
+  font-size:16px; font-weight:600; transition:.25s;
 }
-
-.search-box button:hover {
-    background: #b5895f;
-}
+.search-box button:hover { background:#b5895f; }
 
 /* -----------------------------------------
-   CONTENIDO PRINCIPAL
+   CONTENIDO PRINCIPAL (no pinta el fondo)
 ----------------------------------------- */
-.container {
-    width: 100%;
-    max-width: 1300px;
-    margin: 0 auto;
+.container{
+  width: calc(100% - 40px);            /* usa casi todo el ancho visible */
+  max-width: 1400px;
+  margin-left:auto; margin-right:auto; /* centra el bloque */
+  padding-top: 20px;
+  background: transparent !important;  /* evita mancha blanca */
 }
-
-.section-title {
-    font-size: 34px;
-    font-weight: 700;
-    margin-bottom: 26px;
-    text-align: left;
-    padding-left: 30px;
+.section-title{
+  font-size:34px; font-weight:700; margin-bottom:26px;
+  text-align:left; padding-left:30px;
 }
 
 /* -----------------------------------------
    GRID DE LIBROS (3 POR FILA)
 ----------------------------------------- */
-.book-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
-    padding: 0 30px 50px;
+.book-grid{
+  display:grid; grid-template-columns: repeat(3, 1fr);
+  gap:32px; padding: 0 30px 50px;
 }
 
 /* -----------------------------------------
    TARJETAS DE LIBROS
 ----------------------------------------- */
-.book-card {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 26px 20px 32px;
-    text-align: center;
-    box-shadow: 0px 6px 16px rgba(0,0,0,0.08);
-    transition: 0.3s ease;
+.book-card{
+  background: var(--card-bg);
+  border-radius:18px; padding:26px 20px 32px; text-align:center;
+  box-shadow:0 6px 16px rgba(0,0,0,0.08);
+  transition:.3s ease;
 }
-
-.book-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0px 10px 24px rgba(0,0,0,0.13);
+.book-card:hover{
+  transform: translateY(-6px);
+  box-shadow:0 10px 24px rgba(0,0,0,0.13);
 }
-
-.book-image img {
-    width: 140px;
-    height: 190px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin-bottom: 16px;
+.book-image img{
+  width:140px; height:190px; object-fit:cover; border-radius:10px; margin-bottom:16px;
 }
-
-.book-title {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 6px;
-}
-
-.book-author,
-.book-category {
-    color: #6e6458;
-    margin-bottom: 5px;
-}
-
-.book-stock {
-    margin: 14px 0;
-    font-weight: 600;
-}
-
-.agotado {
-    color: #c05b4d;
-    font-weight: bold;
-}
+.book-title{ font-size:20px; font-weight:700; margin-bottom:6px; }
+.book-author, .book-category{ color: var(--muted); margin-bottom:5px; }
+.book-stock{ margin:14px 0; font-weight:600; }
+.agotado{ color:#c05b4d; font-weight:bold; }
 
 /* -----------------------------------------
    BOTONES
 ----------------------------------------- */
-.reserve-btn {
-    background: #c79d6e;
-    padding: 12px 0;
-    display: block;
-    width: 70%;
-    margin: 0 auto;
-    border-radius: 12px;
-    color: #fff;
-    font-weight: 600;
-    text-decoration: none;
-    transition: 0.25s ease;
+.reserve-btn{
+  background: var(--button);
+  padding:12px 0; display:block; width:70%; margin:0 auto;
+  border-radius:12px; color:#fff; font-weight:600; text-decoration:none; transition:.25s;
+}
+.reserve-btn:hover{ background:#b5895f; }
+.reserve-disabled{
+  background:#d5d0ca; padding:12px 0; border-radius:12px;
+  width:70%; margin:0 auto; color: var(--muted); font-weight:600;
 }
 
-.reserve-btn:hover {
-    background: #b5895f;
-}
-
-/* Botón deshabilitado */
-.reserve-disabled {
-    background: #d5d0ca;
-    padding: 12px 0;
-    border-radius: 12px;
-    width: 70%;
-    margin: 0 auto;
-    color: #6e6458;
-    font-weight: 600;
-}
+/* ===== IMPORTANTE: ELIMINADO =====
+   Se ha eliminado el bloque "SIDEBAR GENERAL" antiguo que fijaba .sidebar,
+   porque el nuevo sidebar es un componente con sus propios estilos.
+   Mantener ese bloque causaba solapamientos y franjas blancas.
+*/
