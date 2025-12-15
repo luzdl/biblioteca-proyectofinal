@@ -4,13 +4,37 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-/* Libros simulados mientras no haya base de datos */
-$libros = [
-    ["id"=>1,"titulo"=>"Cien años de soledad","autor"=>"Gabriel García Márquez","categoria"=>"Novela","stock"=>4,"imagen"=>"../img/libro1.jpg"],
-    ["id"=>2,"titulo"=>"1984","autor"=>"George Orwell","categoria"=>"Distopía","stock"=>0,"imagen"=>"../img/libro2.jpg"],
-    ["id"=>3,"titulo"=>"El principito","autor"=>"Antoine de Saint-Exupéry","categoria"=>"Fábula","stock"=>7,"imagen"=>"../img/libro3.jpg"],
-    ["id"=>4,"titulo"=>"Don Quijote de la Mancha","autor"=>"Miguel de Cervantes","categoria"=>"Clásico","stock"=>2,"imagen"=>"../img/libro4.jpg"],
-];
+// Conectar a la base de datos y obtener los libros
+require_once __DIR__ . '/../config/database.php';
+$db = (new Database())->getConnection();
+
+// Obtener todos los libros con su categoría
+$query = "
+    SELECT 
+        libros.id,
+        libros.titulo,
+        libros.autor,
+        libros.stock,
+        libros.portada AS imagen,
+        categorias_libros.nombre AS categoria
+    FROM libros
+    LEFT JOIN categorias_libros ON libros.categoria_id = categorias_libros.id
+    ORDER BY libros.titulo
+";
+
+$stmt = $db->query($query);
+$libros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Ajustar las rutas de las imágenes
+foreach ($libros as &$libro) {
+    if (!empty($libro['imagen'])) {
+        $libro['imagen'] = 'img/portadas/' . $libro['imagen'];
+    } else {
+        // Imagen por defecto si no hay portada
+        $libro['imagen'] = 'img/default-book.png';
+    }
+}
+unset($libro); // Rompe la referencia del último elemento
 
 /* Búsqueda simple */
 $busqueda = $_GET["q"] ?? "";
