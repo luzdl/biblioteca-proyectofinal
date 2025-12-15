@@ -1,0 +1,210 @@
+/* Paleta consistente */
+:root{
+  --rose:#D38F7A;
+  --mustard:#B99145;
+  --coffee:#574737;
+  --sage:#A5AF89;
+  --terracotta:#C7764A;
+  --blush:#E6C8B1;
+}
+
+/* Wrapper para que el contenido nunca quede pegado al sidebar */
+.catalog-wrap{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 28px 28px;
+}
+
+/* Ajuste extra cuando el sidebar está colapsado (móvil) */
+@media (max-width: 900px){
+  .catalog-wrap{ padding: 12px 20px 24px; }
+}
+
+/* Contenedor general de las repisas */
+.shelves{
+  background: linear-gradient(180deg, #fff, #fbf5ef);
+  border: 1px solid rgba(87,71,55,.08);
+  border-radius: 16px;
+  padding: 18px 18px 8px;
+  box-shadow: 0 10px 26px rgba(87,71,55,.08);
+}
+
+/* Cada bloque (título + fila + madera) */
+.shelf-block{
+  padding: 16px 10px 26px;
+  position: relative;
+}
+.shelf-block + .shelf-block{
+  border-top: 1px dashed rgba(87,71,55,.12);
+}
+
+/* Cabecera de cada repisa */
+.shelf-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin: 2px 6px 10px;
+}
+.shelf-header h3{
+  margin:0;
+  font-size: 1rem;
+  letter-spacing:.06em;
+  text-transform: uppercase;
+  color: rgba(87,71,55,.85);
+}
+.shelf-link{
+  font-size:.9rem;
+  text-decoration:none;
+  color: var(--terracotta);
+}
+.shelf-link:hover{ text-decoration: underline; }
+
+/* Fila de libros */
+.shelf-row{
+  display:flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  padding: 8px 6px 0;
+  position: relative;
+  z-index: 2; /* por encima de la madera */
+}
+
+/* Tarjeta-libro sobre la repisa */
+.book-item{
+  width: 110px;
+  position: relative;
+}
+
+/* Portada del libro */
+.book-cover{
+  width: 110px;
+  height: 160px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    0 6px 12px rgba(0,0,0,.12),
+    0 1px 0 rgba(255,255,255,.8) inset;
+  background:#eee;
+}
+.book-cover img{
+  width:100%;
+  height:100%;
+  object-fit: cover;
+  display:block;
+}
+
+/* Pequeño soporte debajo del libro */
+.book-stand{
+  width: 78px;
+  height: 8px;
+  border-radius: 4px;
+  margin: 6px auto 0;
+  background: #e6d6c6;
+  box-shadow:
+    0 6px 14px rgba(0,0,0,.15),
+    inset 0 1px 0 rgba(255,255,255,.7);
+}
+
+/* Madera de la repisa (ancho completo) */
+.wood-shelf{
+  position: relative;
+  height: 16px;
+  margin-top: 12px;
+  border-radius: 7px;
+  background:
+    linear-gradient(180deg,#f4e5d3,#e8d3bd 55%,#d9c2ab);
+  box-shadow:
+    0 12px 24px rgba(0,0,0,.12),
+    inset 0 2px 0 rgba(255,255,255,.7),
+    inset 0 -2px 0 rgba(87,71,55,.10);
+  border: 1px solid rgba(87,71,55,.10);
+}
+
+/* Overlay en hover con acción */
+.book-item .book-hover{
+  position:absolute;
+  inset: 0 auto auto 0;
+  width: 110px;
+  height: 160px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.45));
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:8px;
+  padding:10px;
+  opacity:0;
+  transition: opacity .2s ease;
+  color:#fff;
+}
+.book-item:hover .book-hover{ opacity: 1; }
+
+.book-hover .meta{
+  position:absolute;
+  left:8px; right:8px; bottom:40px;
+  font-size:.78rem;
+  line-height:1.2;
+  text-align:center;
+}
+.book-hover .meta strong{ display:block; font-weight:700; }
+.book-hover .meta span{ opacity:.9; }
+
+.btn-reserve{
+  display:inline-block;
+  border:none;
+  background: var(--terracotta);
+  color:#fff;
+  padding:6px 10px;
+  border-radius: 999px;
+  font-size:.78rem;
+  font-weight:700;
+  text-decoration:none;
+  cursor:pointer;
+}
+.btn-reserve:hover{ opacity:.92; }
+
+.reserve-disabled{
+  background: rgba(0,0,0,.55);
+  color:#fff;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:.78rem;
+}
+
+/* ======= Responsivo ======= */
+
+/* Tablet: reduce levemente tamaños y gaps */
+@media (max-width: 1200px){
+  .catalog-wrap{ max-width: 1100px; }
+  .shelf-row{ gap: 18px; }
+  .book-item{ width: 104px; }
+  .book-cover{ width:104px; height:152px; }
+  .book-item .book-hover{ width:104px; height:152px; }
+}
+
+/* Desktop angosto / tablet grande con sidebar más cerca */
+@media (max-width: 1024px){
+  .catalog-wrap{ max-width: 980px; padding-left: 24px; padding-right: 24px; }
+}
+
+/* Móvil grande: sidebar colapsa; portadas más pequeñas */
+@media (max-width: 900px){
+  .catalog-wrap{ max-width: 820px; }
+  .shelf-row{ gap: 16px; }
+  .book-item{ width: 96px; }
+  .book-cover{ width:96px; height:140px; }
+  .book-item .book-hover{ width:96px; height:140px; }
+  .book-stand{ width: 66px; }
+  .wood-shelf{ height: 14px; }
+}
+
+/* Móvil mediano/pequeño */
+@media (max-width: 600px){
+  .catalog-wrap{ padding-left: 16px; padding-right: 16px; }
+  .shelf-row{ gap: 12px; }
+  .book-item{ width: 88px; }
+  .book-cover{ width:88px; height:130px; }
+  .book-item .book-hover{ width:88px; height:130px; }
+  .book-stand{ width: 60px; height:7px; }
+  .wood-shelf{ height: 12px; }
+}
