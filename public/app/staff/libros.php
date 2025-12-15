@@ -135,6 +135,7 @@ $libros = $db->query($query)->fetchAll();
         </p>
     <?php endif; ?>
 
+    <div class="table-wrap">
     <table class="table">
         <thead>
             <tr>
@@ -184,18 +185,22 @@ $libros = $db->query($query)->fetchAll();
                         <?php endif; ?>
                     </td>
 
-                    <td class="actions">
-                        <a class="btn-edit" href="<?php echo htmlspecialchars(url_for('app/staff/libros_editar.php', ['id' => $libro['id']])); ?>">Editar</a>
-                        <form method="post" action="<?php echo htmlspecialchars(url_for('app/staff/libros.php')); ?>" style="display:inline">
-                            <input type="hidden" name="accion" value="eliminar">
-                            <input type="hidden" name="id" value="<?php echo (int)$libro['id']; ?>">
-                            <button type="submit" class="btn-delete" onclick="return confirm('¿Seguro que deseas eliminar este libro?')">Eliminar</button>
-                        </form>
+                    <td>
+                        <div class="actions">
+                            <a class="btn-edit" href="<?php echo htmlspecialchars(url_for('app/staff/libros_editar.php', ['id' => $libro['id']])); ?>">Editar</a>
+                            <form method="post" action="<?php echo htmlspecialchars(url_for('app/staff/libros.php')); ?>" style="display:inline">
+                                <input type="hidden" name="accion" value="eliminar">
+                                <input type="hidden" name="id" value="<?php echo (int)$libro['id']; ?>">
+                                <button type="submit" class="btn-delete" onclick="return confirm('¿Seguro que deseas eliminar este libro?')">Eliminar</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
+
+    </div>
 
 </main>
 
