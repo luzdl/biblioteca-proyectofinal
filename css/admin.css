@@ -9,19 +9,19 @@ input, select, button, textarea {
 
 .content {
     margin-left: 0;
-    padding: 2rem;
+    padding: 1.25rem 2rem 2rem;
 }
 
 @media (max-width: 900px) {
     .content {
-        padding: 1.25rem;
+        padding: 1rem 1.25rem 1.25rem;
     }
 }
 
 .title {
     font-size: 1.8rem;
     color: #5a3e2b;
-    margin-bottom: 1.5rem;
+    margin: 0 0 1.25rem 0;
 }
 
 .alert {
