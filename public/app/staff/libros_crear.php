@@ -1,9 +1,22 @@
 <?php
+/**
+ * Staff CRUD: Crear libro.
+ *
+ * Notes:
+ * - Validates required fields via Input/Validator.
+ * - Supports optional cover upload. Files are stored under public/img/portadas
+ *   and metadata is recorded in uploads table when available.
+ */
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['administrador', 'bibliotecario']);
 
 $db = (new Database())->getConnection();
 
+/**
+ * Returns the maximum allowed bytes for a book cover image.
+ *
+ * @return int
+ */
 function libros_portada_limit_bytes(): int
 {
     $dir = __DIR__ . '/../../..' . '/img/portadas';
@@ -22,7 +35,7 @@ function libros_portada_limit_bytes(): int
             }
         }
     }
-    $base = max($max, 2 * 1024 * 1024);
+    $base = max($max, 15 * 1024 * 1024);
     return (int)ceil($base * 1.25);
 }
 
@@ -101,17 +114,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $permitidas = ["jpg", "jpeg", "png", "webp"];
 
-            if (($archivo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            $maxBytes = libros_portada_limit_bytes();
+            $maxMb = number_format($maxBytes / 1048576, 2);
+
+            $uploadErr = (int)($archivo['error'] ?? UPLOAD_ERR_NO_FILE);
+            if ($uploadErr === UPLOAD_ERR_INI_SIZE || $uploadErr === UPLOAD_ERR_FORM_SIZE) {
+                $mensaje = "Archivo demasiado grande. Máximo " . $maxMb . " MB.";
+            } elseif ($uploadErr !== UPLOAD_ERR_OK) {
                 $mensaje = "No se pudo subir la imagen (error de carga).";
             } elseif (!in_array($ext, $permitidas, true)) {
                 $mensaje = "Formato de imagen no permitido.";
             } else {
-                $maxBytes = libros_portada_limit_bytes();
                 $sizeBytes = (int)($archivo['size'] ?? 0);
                 if ($sizeBytes <= 0) {
                     $mensaje = "La imagen está vacía o no es válida.";
                 } elseif ($sizeBytes > $maxBytes) {
-                    $mensaje = "La imagen supera el tamaño permitido (" . number_format($maxBytes / 1048576, 2) . " MB).";
+                    $mensaje = "Archivo demasiado grande. Máximo " . $maxMb . " MB.";
                 } else {
                     $finfo = new finfo(FILEINFO_MIME_TYPE);
                     $mime = (string)$finfo->file((string)($archivo['tmp_name'] ?? ''));

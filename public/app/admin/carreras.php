@@ -1,4 +1,9 @@
 <?php
+/**
+ * CRUD: Carreras (admin + bibliotecario).
+ *
+ * Simple CRUD with minimal validation (required nombre).
+ */
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['administrador', 'bibliotecario']);
 

@@ -1,4 +1,10 @@
 <?php
+/**
+ * CRUD: Categorías de libros (admin + bibliotecario).
+ *
+ * Uses a single controller for both roles. $selfPath determines where links
+ * should point depending on the current role.
+ */
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['administrador', 'bibliotecario']);
 

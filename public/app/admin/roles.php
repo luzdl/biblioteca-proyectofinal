@@ -1,4 +1,10 @@
 <?php
+/**
+ * Admin CRUD: Roles.
+ *
+ * Provides create/update/delete for roles and keeps usuarios.rol in sync
+ * when a role name changes.
+ */
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['administrador']);
 

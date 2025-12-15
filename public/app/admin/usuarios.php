@@ -1,4 +1,14 @@
 <?php
+/**
+ * Admin CRUD: Usuarios.
+ *
+ * This controller handles:
+ * - Listing users
+ * - Creating/updating users
+ * - Deleting users
+ *
+ * Input is normalized through Input::* helpers and validated via Validator.
+ */
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['administrador']);
 
