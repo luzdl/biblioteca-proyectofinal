@@ -1,5 +1,39 @@
 <?php
 
+/**
+ * Establece un mensaje flash que estará disponible en la siguiente petición
+ * 
+ * @param string $message El mensaje a mostrar
+ * @param string $type El tipo de mensaje (success, error, warning, info)
+ * @return void
+ */
+function set_flash_message(string $message, string $type = 'info'): void
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $_SESSION['flash_messages'][] = [
+        'message' => $message,
+        'type' => $type,
+        'timestamp' => time()
+    ];
+}
+
+/**
+ * Obtiene y elimina los mensajes flash
+ * 
+ * @return array Array de mensajes flash
+ */
+function get_flash_messages(): array
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $messages = $_SESSION['flash_messages'] ?? [];
+    unset($_SESSION['flash_messages']);
+    return $messages;
+}
+
 function require_login(): void
 {
     if (!isset($_SESSION['usuario_id'])) {

@@ -2,30 +2,48 @@
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['estudiante']);
 
-$libros = [
-    ["id"=>1,"titulo"=>"Cien años de soledad","autor"=>"Gabriel García Márquez","categoria"=>"Novela","stock"=>4,"imagen"=>url_for('img/libro1.jpg')],
-    ["id"=>2,"titulo"=>"1984","autor"=>"George Orwell","categoria"=>"Distopía","stock"=>0,"imagen"=>url_for('img/libro2.jpg')],
-    ["id"=>3,"titulo"=>"El principito","autor"=>"Antoine de Saint-Exupéry","categoria"=>"Fábula","stock"=>7,"imagen"=>url_for('img/libro3.jpg')],
-    ["id"=>4,"titulo"=>"Don Quijote de la Mancha","autor"=>"Miguel de Cervantes","categoria"=>"Clásico","stock"=>2,"imagen"=>url_for('img/libro4.jpg')],
-];
+$db = (new Database())->getConnection();
+
+// Galería: todos los libros
+$galeriaLibros = [];
+try {
+    $query = "
+        SELECT
+            l.id,
+            l.titulo,
+            l.autor,
+            l.stock,
+            l.portada AS imagen,
+            c.nombre AS categoria
+        FROM libros l
+        LEFT JOIN categorias_libros c ON c.id = l.categoria_id
+        ORDER BY l.titulo
+    ";
+
+    $stmt = $db->query($query);
+    $galeriaLibros = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    foreach ($galeriaLibros as &$libro) {
+        if (!empty($libro['imagen'])) {
+            $libro['imagen'] = url_for('img/portadas/' . ltrim((string)$libro['imagen'], '/'));
+        } else {
+            $libro['imagen'] = url_for('img/default-book.png');
+        }
+    }
+    unset($libro);
+} catch (Exception $e) {
+    $galeriaLibros = [];
+}
 
 $busqueda = $_GET["q"] ?? "";
 if ($busqueda !== "") {
-    $libros = array_filter($libros, function($libro) use ($busqueda) {
-        $q = strtolower($busqueda);
-        return str_contains(strtolower($libro["titulo"]), $q)
-            || str_contains(strtolower($libro["autor"]), $q)
-            || str_contains(strtolower($libro["categoria"]), $q);
-    });
+    $q = strtolower($busqueda);
+    $galeriaLibros = array_values(array_filter($galeriaLibros, function($libro) use ($q) {
+        return str_contains(strtolower($libro["titulo"] ?? ''), $q)
+            || str_contains(strtolower($libro["autor"] ?? ''), $q)
+            || str_contains(strtolower($libro["categoria"] ?? ''), $q);
+    }));
 }
-
-/* Distribución simple en 3 repisas */
-$chunks = array_chunk(array_values($libros), max(1, ceil((count($libros) ?: 1)/3)));
-$shelves = [
-    "En lectura"  => $chunks[0] ?? [],
-    "Por leer"    => $chunks[1] ?? [],
-    "Finalizados" => $chunks[2] ?? [],
-];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -54,61 +72,77 @@ $shelves = [
             <button type="submit">Buscar</button>
         </form>
 
-        <h2 class="section-title">Mi biblioteca</h2>
+        <h2 class="section-title">Galería</h2>
 
-        <!-- ================== REPISAS ================== -->
         <div class="shelves">
-            <?php if (empty($libros)): ?>
+            <?php if (empty($galeriaLibros)): ?>
                 <p>No se encontraron libros para la búsqueda seleccionada.</p>
-            <?php endif; ?>
+            <?php else: ?>
+                <section class="shelf-block">
+                    <div class="shelf-header">
+                        <h3>Libros</h3>
+                        <a class="shelf-link" href="#">Ver todo</a>
+                    </div>
 
-            <?php foreach ($shelves as $shelfTitle => $books): ?>
-            <section class="shelf-block">
-                <div class="shelf-header">
-                    <h3><?php echo htmlspecialchars($shelfTitle); ?></h3>
-                    <a class="shelf-link" href="#">Ver todo</a>
-                </div>
-
-                <div class="shelf-row">
-                    <?php foreach ($books as $book): ?>
-                        <article class="book-item">
-                            <div class="book-cover">
-                                <img src="<?php echo htmlspecialchars($book['imagen']); ?>"
-                                     alt="Portada de <?php echo htmlspecialchars($book['titulo']); ?>">
-                            </div>
-                            <div class="book-stand"></div>
-
-                            <div class="book-hover">
-                                <div class="meta">
-                                    <strong><?php echo htmlspecialchars($book['titulo']); ?></strong>
-                                    <span><?php echo htmlspecialchars($book['autor']); ?></span>
+                    <div class="shelf-row">
+                        <?php foreach ($galeriaLibros as $book): ?>
+                            <article class="book-item">
+                                <div class="book-cover">
+                                    <img src="<?php echo htmlspecialchars($book['imagen']); ?>"
+                                         alt="Portada de <?php echo htmlspecialchars($book['titulo']); ?>">
                                 </div>
-                                <?php if (($book['stock'] ?? 0) > 0): ?>
-                                  <?php if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'estudiante'): ?>
-                                    <a class="btn-reserve" href="reservar.php?id=<?php echo intval($book['id']); ?>">Reservar</a>
-                                  <?php else: ?>
-                                    <button class="btn-reserve needs-login" data-id="<?php echo intval($book['id']); ?>">Reservar</button>
-                                  <?php endif; ?>
-                                <?php else: ?>
-                                    <div class="reserve-disabled">No disponible</div>
-                                <?php endif; ?>
-                            </div>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
+                                <div class="book-stand"></div>
 
-                <!-- La repisa de madera -->
-                <div class="wood-shelf"></div>
-            </section>
-            <?php endforeach; ?>
+                                <div class="book-hover">
+                                    <div class="meta">
+                                        <strong><?php echo htmlspecialchars($book['titulo']); ?></strong>
+                                        <span><?php echo htmlspecialchars($book['autor']); ?></span>
+                                    </div>
+
+                                    <?php if (($book['stock'] ?? 0) > 0): ?>
+                                        <a class="btn-reserve" href="<?php echo htmlspecialchars(url_for('reservar', ['id' => intval($book['id'])])); ?>">Reservar</a>
+                                    <?php else: ?>
+                                        <div class="reserve-disabled">No disponible</div>
+                                    <?php endif; ?>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <div class="wood-shelf"></div>
+                </section>
+            <?php endif; ?>
         </div>
-        <!-- ============================================= -->
     </div>
 
     <?php include __DIR__ . '/../../components/modal.php'; ?>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
     document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('a.btn-reserve').forEach(function(a){
+            a.addEventListener('click', function(e){
+                e.preventDefault();
+                var href = this.getAttribute('href');
+                if (!href) {
+                    return;
+                }
+
+                Swal.fire({
+                    title: '¿Está seguro que quiere reservar este libro?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, reservar',
+                    cancelButtonText: 'No'
+                }).then(function(result){
+                    if (result.isConfirmed) {
+                        window.location.href = href;
+                    }
+                });
+            });
+        });
+
         document.querySelectorAll('.needs-login').forEach(function(btn){
             btn.addEventListener('click', function(){
                 var id = this.getAttribute('data-id');
