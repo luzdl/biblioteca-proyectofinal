@@ -244,6 +244,13 @@ function _sb_active(string $path): bool
         <span class="material-symbols-outlined" aria-hidden="true">school</span>
         <span class="menu-label">Carreras</span>
       </a>
+
+      <a class="menu-link <?php echo _sb_active('public/app/reportes/reservas.php') || _sb_active('app/reportes/reservas.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/reportes/reservas.php')); ?>"
+         data-tooltip="Reportes" aria-label="Reportes">
+        <span class="material-symbols-outlined" aria-hidden="true">bar_chart</span>
+        <span class="menu-label">Reportes</span>
+      </a>
     <?php endif; ?>
 
     <?php if ($isLoggedIn && $sidebarRole === 'bibliotecario'): ?>
@@ -273,6 +280,13 @@ function _sb_active(string $path): bool
          data-tooltip="Reservas" aria-label="Reservas">
         <span class="material-symbols-outlined" aria-hidden="true">list_alt</span>
         <span class="menu-label">Reservas</span>
+      </a>
+
+      <a class="menu-link <?php echo _sb_active('public/app/reportes/reservas.php') || _sb_active('app/reportes/reservas.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/reportes/reservas.php')); ?>"
+         data-tooltip="Reportes" aria-label="Reportes">
+        <span class="material-symbols-outlined" aria-hidden="true">bar_chart</span>
+        <span class="menu-label">Reportes</span>
       </a>
     <?php endif; ?>
 
