@@ -2,29 +2,29 @@
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['estudiante']);
 
-$reservas = [
-    [
-        'id' => 1,
-        'titulo' => 'Cien años de soledad',
-        'autor' => 'García Márquez',
-        'estado' => 'En curso',
-        'imagen' => url_for('img/libro1.jpg'),
-    ],
-    [
-        'id' => 2,
-        'titulo' => 'El Señor de los Anillos',
-        'autor' => 'J.R.R. Tolkien',
-        'estado' => 'Pendiente',
-        'imagen' => url_for('img/libro_lotr.jpg'),
-    ],
-    [
-        'id' => 3,
-        'titulo' => '1984',
-        'autor' => 'George Orwell',
-        'estado' => 'Finalizado',
-        'imagen' => url_for('img/libro_1984.jpg'),
-    ],
-];
+$db = (new Database())->getConnection();
+
+$reservas = [];
+try {
+    $stmt = $db->prepare(
+        "SELECT
+            r.id,
+            r.estado,
+            r.fecha_reserva,
+            l.titulo,
+            l.autor,
+            l.portada AS imagen
+         FROM reservas r
+         INNER JOIN libros l ON l.id = r.libro_id
+         WHERE r.usuario_id = :usuario_id
+           AND r.estado <> 'cancelado'
+         ORDER BY r.fecha_reserva DESC"
+    );
+    $stmt->execute([':usuario_id' => (int)$_SESSION['usuario_id']]);
+    $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+} catch (Exception $e) {
+    $reservas = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -49,16 +49,34 @@ $reservas = [
 
         <div class="books-row">
 
+            <?php if (count($reservas) === 0): ?>
+                <p>No tienes reservas aún.</p>
+            <?php endif; ?>
+
             <?php foreach ($reservas as $reserva): ?>
                 <?php
+                    $imagen = $reserva['imagen'] ?? '';
+                    if (is_string($imagen) && $imagen !== '') {
+                        if (stripos($imagen, 'http://') === 0 || stripos($imagen, 'https://') === 0) {
+                            $imagenUrl = $imagen;
+                        } else {
+                            $imagenUrl = url_for(ltrim($imagen, '/'));
+                        }
+                    } else {
+                        $imagenUrl = url_for('img/user_placeholder.png');
+                    }
+
                     $book = [
-                        'imagen' => $reserva['imagen'],
+                        'imagen' => $imagenUrl,
                         'titulo' => $reserva['titulo'],
                         'autor'  => $reserva['autor'],
                     ];
                     $estadoClass = strtolower(str_replace(' ', '', $reserva['estado']));
                     $extraHtml = '<p class="estado estado-' . $estadoClass . '">' . htmlspecialchars($reserva['estado']) . '</p>';
-                    $extraHtml .= '<a href="#" class="cancel-btn">Cancelar reserva</a>';
+
+                    if (in_array($reserva['estado'], ['pendiente', 'aprobado', 'en curso'], true)) {
+                        $extraHtml .= '<a href="cancelar_reserva.php?id=' . intval($reserva['id']) . '" class="cancel-btn">Cancelar reserva</a>';
+                    }
                 ?>
                 <?php include __DIR__ . '/../../components/book_card.php'; ?>
             <?php endforeach; ?>
@@ -69,6 +87,34 @@ $reservas = [
     </section>
 
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('a.cancel-btn').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            e.preventDefault();
+            var href = this.getAttribute('href');
+            if (!href) {
+                return;
+            }
+
+            Swal.fire({
+                title: '¿Está seguro de cancelar su reserva?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cancelar',
+                cancelButtonText: 'No'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    window.location.href = href;
+                }
+            });
+        });
+    });
+});
+</script>
 
 </body>
 </html>
