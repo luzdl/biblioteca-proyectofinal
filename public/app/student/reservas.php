@@ -36,6 +36,40 @@ try {
     $todas = [];
 }
 
+$cancelPopup = null;
+try {
+    if (!isset($_SESSION['cancel_popup_shown']) || !is_array($_SESSION['cancel_popup_shown'])) {
+        $_SESSION['cancel_popup_shown'] = [];
+    }
+
+    $stmt = $db->prepare(
+        "SELECT
+            r.id,
+            r.libro_id,
+            r.estado,
+            r.fecha_reserva,
+            l.titulo,
+            l.autor,
+            l.portada AS imagen
+         FROM reservas r
+         INNER JOIN libros l ON l.id = r.libro_id
+         WHERE r.usuario_id = :usuario_id
+           AND LOWER(TRIM(r.estado)) = 'cancelado'
+         ORDER BY r.fecha_reserva DESC
+         LIMIT 1"
+    );
+    $stmt->execute([':usuario_id' => (int)$_SESSION['usuario_id']]);
+    $cancelada = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($cancelada && !in_array((int)$cancelada['id'], $_SESSION['cancel_popup_shown'], true)) {
+        $_SESSION['cancel_popup_shown'][] = (int)$cancelada['id'];
+        $cancelPopup = $cancelada;
+    }
+} catch (Exception $e) {
+    error_log('Error cargando popup de cancelación: ' . $e->getMessage());
+    $cancelPopup = null;
+}
+
 // Deduplicar por libro_id y priorizar estado más avanzado
 $porLibro = [];
 foreach ($todas as $r) {
@@ -240,6 +274,41 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+<?php if (!empty($cancelPopup)): ?>
+    <?php
+        $img = $cancelPopup['imagen'] ?? '';
+        if (is_string($img) && $img !== '') {
+            if (stripos($img, 'http://') === 0 || stripos($img, 'https://') === 0) {
+                $cancelImgUrl = $img;
+            } else {
+                $cancelImgUrl = url_for(ltrim($img, '/'));
+            }
+        } else {
+            $cancelImgUrl = url_for('img/user_placeholder.png');
+        }
+        $cancelTitulo = (string)($cancelPopup['titulo'] ?? '');
+        $cancelAutor  = (string)($cancelPopup['autor'] ?? '');
+    ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            title: 'Reserva cancelada',
+            html:
+                '<div style="display:flex;gap:14px;align-items:center;text-align:left;">' +
+                    '<img src="<?php echo htmlspecialchars($cancelImgUrl); ?>" alt="Portada" style="width:64px;height:86px;object-fit:cover;border-radius:8px;border:1px solid #e0d3c2;" />' +
+                    '<div>' +
+                        '<div style="font-weight:700;margin-bottom:4px;"><?php echo htmlspecialchars($cancelTitulo); ?></div>' +
+                        '<div style="opacity:0.85;margin-bottom:10px;"><?php echo htmlspecialchars($cancelAutor); ?></div>' +
+                        '<div style="font-weight:700;color:#b33939;">Lo sentimos, su reserva no fue aprobada.</div>' +
+                    '</div>' +
+                '</div>',
+            icon: 'info',
+            confirmButtonText: 'Entendido'
+        });
+    });
+    </script>
+<?php endif; ?>
 
 </body>
 </html>
