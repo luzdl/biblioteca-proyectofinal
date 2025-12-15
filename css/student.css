@@ -27,38 +27,37 @@ html, body{
 
 /* Cuando existe sidebar (lo añade el componente al <body>) */
 body.has-sidebar{
-  padding-left: 2px !important; /* 260 ancho + margen de respiro */
-  padding-top: 16px;
+  padding-left: calc(var(--sb-width-expanded, 260px) + 16px);
   background: var(--bg-page) !important;
 }
 @media (max-width: 900px){
-  body.has-sidebar{ padding-left: 88px !important; }
+  body.has-sidebar{ padding-left: calc(var(--sb-width-collapsed, 72px) + 16px); }
 }
 
 /* -----------------------------------------
    NAV SUPERIOR (se mantiene)
 ----------------------------------------- */
-.topbar {
+.legacy-topbar {
   display:flex; justify-content:space-between; align-items:center;
   padding: 18px 90px;
   background:#fff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   position: sticky; top:0; z-index:50; /* queda sobre el sidebar */
 }
-.topbar .logo {
+.legacy-topbar .logo {
   font-family:'Inter', sans-serif;
   font-weight:700; letter-spacing:.06em;
   font-size:28px; color: var(--text-main);
 }
-.menu a {
+.legacy-topbar .menu a {
   text-decoration:none; margin:0 18px; font-size:17px;
   color: var(--muted); padding-bottom:4px; transition:.3s;
 }
-.menu a:hover { color: var(--accent); }
-.menu .active {
+.legacy-topbar .menu a:hover { color: var(--accent); }
+.legacy-topbar .menu .active {
   color: var(--accent); font-weight:600; border-bottom:2px solid var(--accent);
 }
-.usuario { font-weight:600; color: var(--text-main); }
+.legacy-topbar .usuario { font-weight:600; color: var(--text-main); }
 
 /* -----------------------------------------
    BUSCADOR

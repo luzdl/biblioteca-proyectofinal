@@ -11,10 +11,16 @@ body {
 }
 
 .content {
-    margin-left: 300px;
+    margin-left: 0;
     padding: 40px 60px;
     background: #f9f7f4;
     min-height: 100vh;
+}
+
+@media (max-width: 900px) {
+    .content {
+        padding: 28px 22px;
+    }
 }
 
 .title {
