@@ -63,18 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    OBTENER RESERVAS
    ============================== */
 $reservas = $db->query(
-    "SELECT
-        r.id,
-        r.estado,
-        r.fecha_reserva,
-        r.fecha_limite,
-        r.fecha_devolucion,
-        u.usuario AS usuario,
-        l.titulo AS libro
+    "SELECT r.*, u.usuario AS usuario, l.titulo AS libro
      FROM reservas r
      INNER JOIN usuarios u ON u.id = r.usuario_id
      INNER JOIN libros l ON l.id = r.libro_id
-     ORDER BY r.fecha_reserva DESC"
+     ORDER BY r.id DESC"
 )->fetchAll();
 ?>
 <!DOCTYPE html>

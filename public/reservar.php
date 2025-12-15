@@ -11,11 +11,38 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'estudiante'
 }
 
 $id = (int)($_GET['id'] ?? 0);
+$desde = (string)($_GET['desde'] ?? '');
+$hasta = (string)($_GET['hasta'] ?? '');
 
 if (!$id) {
     $_SESSION['mensaje'] = "ID de libro no válido";
     $_SESSION['tipo_mensaje'] = "error";
     redirect('home');
+    exit;
+}
+
+$desde = trim($desde);
+$hasta = trim($hasta);
+if ($desde === '' || $hasta === '') {
+    $_SESSION['mensaje'] = 'Debes seleccionar la fecha desde y la fecha hasta para reservar.';
+    $_SESSION['tipo_mensaje'] = 'error';
+    redirect('student');
+    exit;
+}
+
+$dDesde = DateTime::createFromFormat('Y-m-d', $desde);
+$dHasta = DateTime::createFromFormat('Y-m-d', $hasta);
+if (!$dDesde || !$dHasta || $dDesde->format('Y-m-d') !== $desde || $dHasta->format('Y-m-d') !== $hasta) {
+    $_SESSION['mensaje'] = 'Formato de fecha inválido.';
+    $_SESSION['tipo_mensaje'] = 'error';
+    redirect('student');
+    exit;
+}
+
+if ($hasta < $desde) {
+    $_SESSION['mensaje'] = 'La fecha hasta debe ser mayor o igual a la fecha desde.';
+    $_SESSION['tipo_mensaje'] = 'error';
+    redirect('student');
     exit;
 }
 
@@ -40,9 +67,11 @@ try {
     }
     
     // Crear la reserva
-    $stmt = $db->prepare("INSERT INTO reservas (usuario_id, libro_id, estado, fecha_reserva) VALUES (?, ?, 'pendiente', NOW())");
+    $fechaReserva = $desde . ' 00:00:00';
+    $fechaLimite = $hasta;
+    $stmt = $db->prepare("INSERT INTO reservas (usuario_id, libro_id, estado, fecha_reserva, fecha_limite) VALUES (?, ?, 'pendiente', ?, ?)");
     
-    if ($stmt->execute([$_SESSION['usuario_id'], $id])) {
+    if ($stmt->execute([$_SESSION['usuario_id'], $id, $fechaReserva, $fechaLimite])) {
         // Actualizar el stock del libro
         $updateStock = $db->prepare("UPDATE libros SET stock = stock - 1 WHERE id = ?");
         $updateStock->execute([$id]);

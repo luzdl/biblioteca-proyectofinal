@@ -10,7 +10,7 @@ $sql = "
     FROM reservas r
     INNER JOIN usuarios u ON r.usuario_id = u.id
     INNER JOIN libros l ON r.libro_id = l.id
-    ORDER BY r.fecha_reserva DESC
+    ORDER BY r.id DESC
 ";
 
 $reservas = $db->query($sql)->fetchAll();

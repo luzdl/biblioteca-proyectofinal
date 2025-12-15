@@ -135,15 +135,49 @@ if ($busqueda !== "") {
                     return;
                 }
 
+                var today = new Date();
+                var pad = function(n){ return String(n).padStart(2, '0'); };
+                var todayStr = today.getFullYear() + '-' + pad(today.getMonth() + 1) + '-' + pad(today.getDate());
+
                 Swal.fire({
-                    title: '¿Está seguro que quiere reservar este libro?',
+                    title: 'Reservar libro',
+                    html:
+                        '<div style="display:flex;flex-direction:column;gap:12px;text-align:left;">' +
+                            '<label style="font-weight:600;">Fecha desde' +
+                                '<input id="swal-fecha-desde" type="date" class="swal2-input" style="margin:6px 0 0 0;width:100%;" value="' + todayStr + '" min="' + todayStr + '">' +
+                            '</label>' +
+                            '<label style="font-weight:600;">Fecha hasta' +
+                                '<input id="swal-fecha-hasta" type="date" class="swal2-input" style="margin:6px 0 0 0;width:100%;" min="' + todayStr + '">' +
+                            '</label>' +
+                        '</div>',
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Sí, reservar',
-                    cancelButtonText: 'No'
+                    confirmButtonText: 'Reservar',
+                    cancelButtonText: 'Cancelar',
+                    preConfirm: function(){
+                        var desde = document.getElementById('swal-fecha-desde').value;
+                        var hasta = document.getElementById('swal-fecha-hasta').value;
+                        if (!desde || !hasta) {
+                            Swal.showValidationMessage('Debes seleccionar ambas fechas.');
+                            return false;
+                        }
+                        if (hasta < desde) {
+                            Swal.showValidationMessage('La fecha "hasta" debe ser mayor o igual a la fecha "desde".');
+                            return false;
+                        }
+                        return { desde: desde, hasta: hasta };
+                    }
                 }).then(function(result){
-                    if (result.isConfirmed) {
-                        window.location.href = href;
+                    if (result.isConfirmed && result.value) {
+                        try {
+                            var u = new URL(href, window.location.origin);
+                            u.searchParams.set('desde', result.value.desde);
+                            u.searchParams.set('hasta', result.value.hasta);
+                            window.location.href = u.toString();
+                        } catch (e) {
+                            var join = href.indexOf('?') === -1 ? '?' : '&';
+                            window.location.href = href + join + 'desde=' + encodeURIComponent(result.value.desde) + '&hasta=' + encodeURIComponent(result.value.hasta);
+                        }
                     }
                 });
             });
