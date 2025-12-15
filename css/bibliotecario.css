@@ -147,6 +147,44 @@ body {
     font-size: 15px;
 }
 
+.estado {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1.2;
+    border: 1px solid transparent;
+    color: #4a3322;
+    background: #efe3d3;
+}
+
+.estado.pendiente {
+    background: #fff7f3;
+    border-color: #f5c8b0;
+    color: #9a4f2a;
+}
+
+.estado.aprobado,
+.estado.en_curso,
+.estado.en-curso {
+    background: #e8f5e9;
+    border-color: #c8e6c9;
+    color: #2e7d32;
+}
+
+.estado.finalizado {
+    background: #e3f2fd;
+    border-color: #bbdefb;
+    color: #1565c0;
+}
+
+.estado.cancelado {
+    background: #fdecea;
+    border-color: #f5c6cb;
+    color: #b71c1c;
+}
+
 /* Portadas */
 .mini-portada {
     width: 50px;

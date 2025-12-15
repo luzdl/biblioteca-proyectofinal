@@ -80,14 +80,30 @@ $reservas = $db->query($sql)->fetchAll();
             <td><?= htmlspecialchars($r['titulo_libro']) ?></td>
             <td><?= $r['fecha_reserva'] ?></td>
             <td><?= $r['fecha_limite'] ?? '---' ?></td>
-            <td><?= ucfirst($r['estado']) ?></td>
+            <td>
+                <?php
+                    $estadoRaw = (string)($r['estado'] ?? '');
+                    $estadoRawTrim = trim($estadoRaw);
+                    $hasFechaLimite = !empty($r['fecha_limite']);
+
+                    if ($estadoRawTrim === '' && $hasFechaLimite) {
+                        $estadoNorm = 'en_curso';
+                    } elseif ($estadoRawTrim === '') {
+                        $estadoNorm = 'pendiente';
+                    } else {
+                        $estadoNorm = strtolower(trim($estadoRawTrim));
+                    }
+
+                    echo htmlspecialchars(in_array($estadoNorm, ['aprobado', 'en_curso', 'en curso'], true) ? 'Aceptado' : ucfirst($estadoNorm));
+                ?>
+            </td>
 
             <td>
                 <?php if ($r['estado'] === 'pendiente'): ?>
                     <a href="<?php echo htmlspecialchars(url_for('app/staff/bibliotecario_reservas_acciones.php', ['action' => 'aprobar', 'id' => $r['id']])); ?>" class="btn aprobar">Aprobar</a>
                 <?php endif ?>
 
-                <?php if ($r['estado'] === 'en_curso'): ?>
+                <?php if (in_array($r['estado'], ['aprobado', 'en_curso'], true)): ?>
                     <a href="<?php echo htmlspecialchars(url_for('app/staff/bibliotecario_reservas_acciones.php', ['action' => 'finalizar', 'id' => $r['id']])); ?>" class="btn finalizar">Finalizar</a>
                 <?php endif ?>
             </td>
