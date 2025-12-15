@@ -16,6 +16,7 @@ reservas_report_handle_export($db);
     <title>Reportes | Reservas</title>
 
     <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/admin.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/bibliotecario.css')); ?>">
     <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/profile.css')); ?>">
     <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/reportes_reservas.css')); ?>">
 </head>
