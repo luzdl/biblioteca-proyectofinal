@@ -38,13 +38,10 @@ if ($action === "aprobar") {
 
     $db->prepare("
         UPDATE reservas 
-        SET estado = 'en_curso', fecha_limite = ?
+        SET estado = 'en_curso',
+            fecha_limite = COALESCE(NULLIF(fecha_limite, ''), ?)
         WHERE id = ?
     ")->execute([$fecha_limite, $id]);
-
-    // reducir stock del libro
-    $db->prepare("UPDATE libros SET stock = stock - 1 WHERE id = ?")
-       ->execute([$reserva['libro_id']]);
 
     header('Location: ' . url_for('app/staff/bibliotecario_reservas.php'));
     exit;
@@ -82,8 +79,8 @@ if ($action === "cancelar") {
         exit;
     }
 
-    // Si estaba aprobada/en curso, devolver stock
-    if (in_array($estadoNorm, ['en_curso', 'en curso', 'aprobado'], true)) {
+    // Devolver stock si la reserva estaba reteniendo stock (pendiente o aprobada)
+    if (in_array($estadoNorm, ['pendiente', 'en_curso', 'en curso', 'aprobado'], true)) {
         $db->prepare("UPDATE libros SET stock = stock + 1 WHERE id = ?")
            ->execute([$reserva['libro_id']]);
     }
@@ -100,8 +97,8 @@ if ($action === "cancelar") {
    ============================================================ */
 if ($action === "eliminar") {
 
-    // Si está activa/aprobada, devolver stock antes de eliminar
-    if (in_array($estadoNorm, ['en_curso', 'en curso', 'aprobado'], true)) {
+    // Si está reteniendo stock (pendiente o aprobada), devolver stock antes de eliminar
+    if (in_array($estadoNorm, ['pendiente', 'en_curso', 'en curso', 'aprobado'], true)) {
         $db->prepare("UPDATE libros SET stock = stock + 1 WHERE id = ?")
            ->execute([$reserva['libro_id']]);
     }
