@@ -86,6 +86,8 @@ html, body {
 }
 
 .estado-en { color: #2e7d32; }
+.estado-aprobado { color: #2e7d32; }
+.book-card .estado.estado-aprobado { color: #2e7d32 !important; }
 .estado-pendiente { color: #b8841d; }
 .estado-finalizado { color: #b33939; }
 

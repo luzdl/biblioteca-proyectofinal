@@ -31,9 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($reserva_id > 0) {
 
         if ($accion === 'aprobar') {
-            // pendiente → en curso
+            // pendiente → en_curso
             $stmt = $db->prepare(
-                "UPDATE reservas SET estado = 'en curso' WHERE id = :id"
+                "UPDATE reservas SET estado = 'en_curso' WHERE id = :id"
             );
             $stmt->execute([':id' => $reserva_id]);
 
@@ -125,13 +125,30 @@ include __DIR__ . "/sidebar.php";
                 <td><?= htmlspecialchars($r['libro']) ?></td>
                 <td><?= date('d/m/Y', strtotime($r['fecha_reserva'])) ?></td>
                 <td>
-                    <span class="estado <?= str_replace(' ', '-', $r['estado']) ?>">
-                        <?= ucfirst($r['estado']) ?>
+                    <?php
+                        $estadoRaw = (string)($r['estado'] ?? '');
+                        $estadoRawTrim = trim($estadoRaw);
+                        $hasFechaLimite = !empty($r['fecha_limite']);
+
+                        // Si el estado está vacío pero hay fecha límite, fue aprobada (DB no guardó el valor)
+                        if ($estadoRawTrim === '' && $hasFechaLimite) {
+                            $estadoNorm = 'en_curso';
+                        } elseif ($estadoRawTrim === '') {
+                            $estadoNorm = 'pendiente';
+                        } else {
+                            $estadoNorm = strtolower(trim($estadoRawTrim));
+                        }
+
+                        $estadoClass = str_replace(' ', '-', $estadoNorm);
+                        $estadoLabel = in_array($estadoNorm, ['aprobado', 'en_curso', 'en curso'], true) ? 'Aceptado' : ucfirst($estadoNorm);
+                    ?>
+                    <span class="estado <?= htmlspecialchars($estadoClass) ?>">
+                        <?= htmlspecialchars($estadoLabel) ?>
                     </span>
                 </td>
                 <td class="actions">
 
-                    <?php if ($r['estado'] === 'pendiente'): ?>
+                    <?php if ($estadoNorm === 'pendiente'): ?>
                         <form method="post" style="display:inline">
                             <input type="hidden" name="reserva_id" value="<?= $r['id'] ?>">
                             <input type="hidden" name="accion" value="aprobar">
@@ -144,7 +161,7 @@ include __DIR__ . "/sidebar.php";
                             <button class="btn-delete">Cancelar</button>
                         </form>
 
-                    <?php elseif ($r['estado'] === 'en curso'): ?>
+                    <?php elseif (in_array($estadoNorm, ['aprobado', 'en curso', 'en_curso'], true)): ?>
                         <form method="post" style="display:inline">
                             <input type="hidden" name="reserva_id" value="<?= $r['id'] ?>">
                             <input type="hidden" name="accion" value="finalizar">
