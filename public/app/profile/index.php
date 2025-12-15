@@ -119,10 +119,14 @@ $rol = (string)($profileData['rol'] ?? '');
             <?php if ($rol === 'administrador'): ?>
                 <li><a href="<?php echo url_for('app/admin/categorias.php'); ?>">Gestionar categorías</a></li>
                 <li><a href="<?php echo url_for('app/admin/carreras.php'); ?>">Gestionar carreras</a></li>
+                 <li><a href="<?php echo url_for('app/admin/usuarios.php'); ?>">Gestionar usuarios</a></li>
+                  <li><a href="<?php echo url_for('app/admin/roles.php'); ?>">Gestionar roles</a></li>
             <?php endif; ?>
 
             <?php if ($rol === 'bibliotecario'): ?>
-                <li><a href="<?php echo url_for('app/admin/carreras.php'); ?>">Gestionar carreras</a></li>
+                <li><a href="<?php echo url_for('app/staff/libros.php'); ?>">Gestionar libros</a></li>
+                 <li><a href="<?php echo url_for('app/staff/categorias.php'); ?>">Gestionar categorías</a></li>
+                 <li><a href="<?php echo url_for('app/staff/reservas.php'); ?>">Gestionar reservas</a></li>
             <?php endif; ?>
 
             <?php if ($rol === 'estudiante'): ?>
