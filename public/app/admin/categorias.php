@@ -1,4 +1,10 @@
 <?php
+/**
+ * CRUD: Categorías de libros (admin + bibliotecario).
+ *
+ * Uses a single controller for both roles. $selfPath determines where links
+ * should point depending on the current role.
+ */
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['administrador', 'bibliotecario']);
 
@@ -15,7 +21,7 @@ $tipoMensaje = "";
    ELIMINAR CATEGORÍA
    ============================== */
 if (isset($_GET['eliminar'])) {
-    $id = (int) $_GET['eliminar'];
+    $id = Input::getInt('eliminar', 0);
 
     if ($id > 0) {
         try {
@@ -38,7 +44,7 @@ if (isset($_GET['eliminar'])) {
 $categoriaEditar = null;
 
 if (isset($_GET['editar'])) {
-    $id = (int) $_GET['editar'];
+    $id = Input::getInt('editar', 0);
 
     if ($id > 0) {
         $stmt = $db->prepare(
@@ -53,11 +59,14 @@ if (isset($_GET['editar'])) {
    CREAR / ACTUALIZAR CATEGORÍA
    ============================== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = trim($_POST['nombre'] ?? '');
-    $id     = (int) ($_POST['id'] ?? 0);
+    $nombre = Input::postString('nombre');
+    $id = Input::postInt('id', 0);
 
-    if ($nombre === '') {
-        $mensaje = "El nombre de la categoría es obligatorio.";
+    $v = new Validator();
+    $v->required('nombre', $nombre, 'El nombre de la categoría es obligatorio.');
+
+    if (!$v->ok()) {
+        $mensaje = $v->firstError();
         $tipoMensaje = "error";
     } else {
         try {

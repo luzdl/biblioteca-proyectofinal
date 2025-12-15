@@ -1,4 +1,12 @@
 <?php
+/**
+ * Staff CRUD: Editar libro.
+ *
+ * Notes:
+ * - Validates required fields via Input/Validator.
+ * - Supports optional cover upload to public/img/portadas.
+ * - When schema supports it, links libros.portada_upload_id to uploads.id.
+ */
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['administrador', 'bibliotecario']);
 
@@ -21,7 +29,7 @@ function libros_portada_limit_bytes(): int
             }
         }
     }
-    $base = max($max, 2 * 1024 * 1024);
+    $base = max($max, 15 * 1024 * 1024);
     return (int)ceil($base * 1.25);
 }
 
@@ -113,13 +121,19 @@ $mensaje = "";
 /* Procesar formulario */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $titulo = trim($_POST["titulo"]);
-    $autor = trim($_POST["autor"]);
-    $categoria_id = intval($_POST["categoria_id"]);
-    $descripcion = trim($_POST["descripcion"]);
-    $stock = intval($_POST["stock"]);
+    $titulo = Input::postString('titulo');
+    $autor = Input::postString('autor');
+    $categoria_id = Input::postInt('categoria_id', 0);
+    $descripcion = Input::postString('descripcion');
+    $stock = Input::postInt('stock', 0);
 
-    if ($titulo === "" || $autor === "" || $categoria_id <= 0 || $stock < 0) {
+    $v = new Validator();
+    $v->required('titulo', $titulo, 'El título es obligatorio.');
+    $v->required('autor', $autor, 'El autor es obligatorio.');
+    $v->minInt('categoria_id', $categoria_id, 1, 'Debe seleccionar una categoría válida.');
+    $v->minInt('stock', $stock, 0, 'El stock no puede ser negativo.');
+
+    if (!$v->ok()) {
         $mensaje = "Completa todos los campos obligatorios.";
     } else {
 
@@ -134,17 +148,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $permitidas = ["jpg", "jpeg", "png", "webp"];
 
-            if (($archivo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            $maxBytes = libros_portada_limit_bytes();
+            $maxMb = number_format($maxBytes / 1048576, 2);
+
+            $uploadErr = (int)($archivo['error'] ?? UPLOAD_ERR_NO_FILE);
+            if ($uploadErr === UPLOAD_ERR_INI_SIZE || $uploadErr === UPLOAD_ERR_FORM_SIZE) {
+                $mensaje = "Archivo demasiado grande. Máximo " . $maxMb . " MB.";
+            } elseif ($uploadErr !== UPLOAD_ERR_OK) {
                 $mensaje = "No se pudo subir la imagen (error de carga).";
             } elseif (!in_array($ext, $permitidas, true)) {
                 $mensaje = "Formato de imagen no permitido.";
             } else {
-                $maxBytes = libros_portada_limit_bytes();
                 $sizeBytes = (int)($archivo['size'] ?? 0);
                 if ($sizeBytes <= 0) {
                     $mensaje = "La imagen está vacía o no es válida.";
                 } elseif ($sizeBytes > $maxBytes) {
-                    $mensaje = "La imagen supera el tamaño permitido (" . number_format($maxBytes / 1048576, 2) . " MB).";
+                    $mensaje = "Archivo demasiado grande. Máximo " . $maxMb . " MB.";
                 } else {
                     $finfo = new finfo(FILEINFO_MIME_TYPE);
                     $mime = (string)$finfo->file((string)($archivo['tmp_name'] ?? ''));

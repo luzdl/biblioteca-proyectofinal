@@ -163,10 +163,10 @@ id=<?php echo (int)($r['id'] ?? 0); ?> libro_id=<?php echo (int)($r['libro_id'] 
                         if (stripos($imagen, 'http://') === 0 || stripos($imagen, 'https://') === 0) {
                             $imagenUrl = $imagen;
                         } else {
-                            $imagenUrl = url_for(ltrim($imagen, '/'));
+                            $imagenUrl = url_for('img/portadas/' . ltrim($imagen, '/'));
                         }
                     } else {
-                        $imagenUrl = url_for('img/user_placeholder.png');
+                        $imagenUrl = url_for('img/default-book.png');
                     }
 
                     $estadoRaw = (string)($reserva['estado'] ?? '');
@@ -209,10 +209,10 @@ id=<?php echo (int)($r['id'] ?? 0); ?> libro_id=<?php echo (int)($r['libro_id'] 
                         if (stripos($imagen, 'http://') === 0 || stripos($imagen, 'https://') === 0) {
                             $imagenUrl = $imagen;
                         } else {
-                            $imagenUrl = url_for(ltrim($imagen, '/'));
+                            $imagenUrl = url_for('img/portadas/' . ltrim($imagen, '/'));
                         }
                     } else {
-                        $imagenUrl = url_for('img/user_placeholder.png');
+                        $imagenUrl = url_for('img/default-book.png');
                     }
 
                     $estadoRaw = (string)($reserva['estado'] ?? '');
@@ -282,10 +282,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (stripos($img, 'http://') === 0 || stripos($img, 'https://') === 0) {
                 $cancelImgUrl = $img;
             } else {
-                $cancelImgUrl = url_for(ltrim($img, '/'));
+                $cancelImgUrl = url_for('img/portadas/' . ltrim($img, '/'));
             }
         } else {
-            $cancelImgUrl = url_for('img/user_placeholder.png');
+            $cancelImgUrl = url_for('img/default-book.png');
         }
         $cancelTitulo = (string)($cancelPopup['titulo'] ?? '');
         $cancelAutor  = (string)($cancelPopup['autor'] ?? '');

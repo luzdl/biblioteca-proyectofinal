@@ -1,4 +1,10 @@
 <?php
+/**
+ * Admin CRUD: Roles.
+ *
+ * Provides create/update/delete for roles and keeps usuarios.rol in sync
+ * when a role name changes.
+ */
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['administrador']);
 
@@ -58,12 +64,15 @@ if (isset($_GET['editar'])) {
 
 // 3) CREATE OR UPDATE ROLE
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-    $name = trim($_POST['name'] ?? '');
-    $description = trim($_POST['description'] ?? '');
+    $id = Input::postInt('id', 0);
+    $name = Input::postString('name');
+    $description = Input::postString('description');
 
-    if ($name === '') {
-        $mensaje = "El nombre del rol es obligatorio.";
+    $v = new Validator();
+    $v->required('name', $name, 'El nombre del rol es obligatorio.');
+
+    if (!$v->ok()) {
+        $mensaje = $v->firstError();
         $tipoMensaje = "error";
         $rolEditar = ['id' => $id, 'name' => $name, 'description' => $description];
     } else {

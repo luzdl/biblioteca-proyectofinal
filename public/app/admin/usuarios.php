@@ -1,4 +1,14 @@
 <?php
+/**
+ * Admin CRUD: Usuarios.
+ *
+ * This controller handles:
+ * - Listing users
+ * - Creating/updating users
+ * - Deleting users
+ *
+ * Input is normalized through Input::* helpers and validated via Validator.
+ */
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['administrador']);
 
@@ -46,36 +56,26 @@ if (isset($_GET['editar'])) {
 
 // 3) CREATE OR UPDATE USER
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-    $usuario = trim($_POST['usuario'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $rol = trim($_POST['rol'] ?? '');
-    $password = $_POST['password'] ?? '';
+    $id = Input::postInt('id', 0);
+    $usuario = Input::postString('usuario');
+    $email = Input::postString('email');
+    $rol = Input::postString('rol');
+    $password = Input::postRawString('password', '');
 
-    $errors = [];
-    if ($usuario === '') {
-        $fieldErrors['usuario'] = "El nombre de usuario es obligatorio.";
-        $errors[] = $fieldErrors['usuario'];
-    }
-    if ($email === '') {
-        $fieldErrors['email'] = "El email es obligatorio.";
-        $errors[] = $fieldErrors['email'];
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $fieldErrors['email'] = "El email no es válido.";
-        $errors[] = $fieldErrors['email'];
-    }
-    if ($rol === '') {
-        $fieldErrors['rol'] = "Debe seleccionar un rol.";
-        $errors[] = $fieldErrors['rol'];
-    }
-    if ($id === 0 && $password === '') {
-        $fieldErrors['password'] = "La contraseña es obligatoria para nuevos usuarios.";
-        $errors[] = $fieldErrors['password'];
+    $v = new Validator();
+    $v->required('usuario', $usuario, 'El nombre de usuario es obligatorio.');
+    $v->required('email', $email, 'El email es obligatorio.');
+    $v->email('email', $email, 'El email no es válido.');
+    $v->required('rol', $rol, 'Debe seleccionar un rol.');
+    if ($id === 0) {
+        $v->required('password', $password, 'La contraseña es obligatoria para nuevos usuarios.');
     }
 
-    if (!empty($errors)) {
-        $mensaje = implode(' ', $errors);
-        $tipoMensaje = "error";
+    $fieldErrors = $v->errors();
+
+    if (!$v->ok()) {
+        $mensaje = implode(' ', array_values($fieldErrors));
+        $tipoMensaje = 'error';
         // Keep form data
         $usuarioEditar = [
             'id' => $id,

@@ -35,13 +35,14 @@ try {
     $galeriaLibros = [];
 }
 
+/* Búsqueda simple (mb_strtolower para soporte UTF-8/acentos) */
 $busqueda = $_GET["q"] ?? "";
 if ($busqueda !== "") {
-    $q = strtolower($busqueda);
+    $q = mb_strtolower($busqueda, 'UTF-8');
     $galeriaLibros = array_values(array_filter($galeriaLibros, function($libro) use ($q) {
-        return str_contains(strtolower($libro["titulo"] ?? ''), $q)
-            || str_contains(strtolower($libro["autor"] ?? ''), $q)
-            || str_contains(strtolower($libro["categoria"] ?? ''), $q);
+        return str_contains(mb_strtolower($libro["titulo"] ?? '', 'UTF-8'), $q)
+            || str_contains(mb_strtolower($libro["autor"] ?? '', 'UTF-8'), $q)
+            || str_contains(mb_strtolower($libro["categoria"] ?? '', 'UTF-8'), $q);
     }));
 }
 ?>
