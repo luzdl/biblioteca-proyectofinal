@@ -1,19 +1,12 @@
 <?php
-session_start();
-
-if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'bibliotecario') {
-    header("Location: ../public/login.php");
-    exit;
-}
-
-require_once __DIR__ . "/../../../config/database.php";
-require_once __DIR__ . "/../../../config/env.php";
+require_once __DIR__ . '/../../lib/bootstrap.php';
+require_role(['administrador', 'bibliotecario']);
 
 $db = (new Database())->getConnection();
 
 /* Obtener ID del libro */
 if (!isset($_GET["id"])) {
-    header("Location: libros.php");
+    header('Location: ' . url_for('app/staff/libros.php'));
     exit;
 }
 
@@ -58,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $nombreNuevo = uniqid("libro_") . "." . $ext;
 
-            move_uploaded_file($archivo["tmp_name"], "../img/portadas/" . $nombreNuevo);
+            move_uploaded_file($archivo["tmp_name"], __DIR__ . "/../../img/portadas/" . $nombreNuevo);
 
             $portadaNueva = $nombreNuevo;
         }
@@ -84,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ":id" => $id
         ]);
 
-        header("Location: libros.php?editado=1");
+        header('Location: ' . url_for('app/staff/libros.php', ['editado' => 1]));
         exit;
     }
 }
@@ -95,16 +88,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Editar libro</title>
-    <link rel="stylesheet" href="../css/sidebar.css">
-    <link rel="stylesheet" href="../css/bibliotecario.css">
+
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/admin.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/bibliotecario.css')); ?>">
 </head>
 
 <body>
 
-<?php 
-$active = "libros";
-include "sidebar.php"; 
-?>
+<?php include __DIR__ . '/../../components/sidebar.php'; ?>
+<?php include __DIR__ . '/../../components/topbar.php'; ?>
 
 <main class="content">
 
@@ -146,7 +138,7 @@ include "sidebar.php";
         <div class="field">
             <label>Portada actual</label>
             <?php if ($libro['portada']): ?>
-                <img src="../img/portadas/<?= htmlspecialchars($libro['portada']) ?>" class="edit-portada">
+                <img src="<?php echo htmlspecialchars(url_for('img/portadas/' . $libro['portada'])); ?>" class="edit-portada">
             <?php else: ?>
                 <p class="no-img">Sin portada</p>
             <?php endif; ?>

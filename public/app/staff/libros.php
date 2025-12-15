@@ -1,22 +1,6 @@
 <?php
-session_start();
-
-/* ==============================
-   VALIDAR ACCESO DEL BIBLIOTECARIO
-   ============================== */
-if (
-    !isset($_SESSION['usuario_rol']) ||
-    $_SESSION['usuario_rol'] !== 'bibliotecario'
-) {
-    header("Location: ../../login.php");
-    exit;
-}
-
-/* ==============================
-   CONEXIÓN A LA BASE DE DATOS
-   ============================== */
-require_once __DIR__ . "/../../../config/database.php";
-require_once __DIR__ . "/../../../config/env.php";
+require_once __DIR__ . '/../../lib/bootstrap.php';
+require_role(['administrador', 'bibliotecario']);
 
 $db = (new Database())->getConnection();
 
@@ -45,26 +29,20 @@ $libros = $db->query($query)->fetchAll();
     <meta charset="UTF-8">
     <title>Gestión de libros</title>
 
-    <!-- ESTILOS (RUTAS CORRECTAS) -->
-    <link rel="stylesheet" href="../../../css/sidebar.css">
-    <link rel="stylesheet" href="../../../css/bibliotecario.css">
-
-    <!-- ICONOS -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/admin.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/bibliotecario.css')); ?>">
 </head>
 
 <body>
 
-<?php
-    $active = "libros";
-    include __DIR__ . "/sidebar.php";
-?>
+<?php include __DIR__ . '/../../components/sidebar.php'; ?>
+<?php include __DIR__ . '/../../components/topbar.php'; ?>
 
 <main class="content">
 
     <div class="top-bar">
         <h1 class="page-title">Gestión de Libros</h1>
-        <a href="libros_crear.php" class="btn-add">+ Añadir libro</a>
+        <a href="<?php echo htmlspecialchars(url_for('app/staff/libros_crear.php')); ?>" class="btn-add">+ Añadir libro</a>
     </div>
 
     <table class="table">
@@ -85,7 +63,7 @@ $libros = $db->query($query)->fetchAll();
                     <td>
                         <?php if ($libro['portada']): ?>
                             <img 
-                                src="../../../img/portadas/<?= htmlspecialchars($libro['portada']); ?>" 
+                                src="<?php echo htmlspecialchars(url_for('img/portadas/' . $libro['portada'])); ?>" 
                                 class="mini-portada"
                                 alt="Portada"
                             >
@@ -107,10 +85,10 @@ $libros = $db->query($query)->fetchAll();
                     </td>
 
                     <td class="actions">
-                        <a class="btn-edit" href="libros_editar.php?id=<?= $libro['id'] ?>">Editar</a>
+                        <a class="btn-edit" href="<?php echo htmlspecialchars(url_for('app/staff/libros_editar.php', ['id' => $libro['id']])); ?>">Editar</a>
                         <a 
                             class="btn-delete"
-                            href="libros_eliminar.php?id=<?= $libro['id'] ?>"
+                            href="<?php echo htmlspecialchars(url_for('app/staff/libros_eliminar.php', ['id' => $libro['id']])); ?>"
                             onclick="return confirm('¿Seguro que deseas eliminar este libro?')"
                         >
                             Eliminar

@@ -2,6 +2,22 @@
       ESTILOS DEL DASHBOARD
    =============================== */
 
+:root {
+    --coffee: #7A5C3A;
+    --coffee-light: #D6C4AF;
+    --coffee-hover: #E8D9C7;
+    --danger-light: #E7B6B1;
+    --danger-hover: #CC8E86;
+    --bg: #F5EEE4;
+    --line: #E0D3C2;
+    --text: #4E3B26;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+}
+
 .page-title {
     font-size: 32px;
     font-weight: 700;

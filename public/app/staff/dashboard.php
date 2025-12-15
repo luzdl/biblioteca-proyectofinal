@@ -1,28 +1,6 @@
 <?php
-session_start();
-
-/* ==============================
-   VALIDAR ACCESO DEL BIBLIOTECARIO
-   ============================== */
-if (
-    !isset($_SESSION['usuario_rol']) ||
-    $_SESSION['usuario_rol'] !== 'bibliotecario'
-) {
-    header("Location: ../../login.php");
-    exit;
-}
-
-/* ==============================
-   CONEXIÓN A LA BASE DE DATOS
-   ============================== */
-/*
- Estructura real:
- public/app/staff/dashboard.php
- ↑↑↑
- config/database.php
-*/
-require_once __DIR__ . "/../../../config/database.php";
-require_once __DIR__ . "/../../../config/env.php";
+require_once __DIR__ . '/../../lib/bootstrap.php';
+require_role(['administrador', 'bibliotecario']);
 
 $db = (new Database())->getConnection();
 
@@ -51,21 +29,14 @@ $reservasPendientes = $db->query(
     <meta charset="UTF-8">
     <title>Panel del Bibliotecario</title>
 
-    <!-- ESTILOS -->
-    <link rel="stylesheet" href="../../../css/sidebar.css">
-    <link rel="stylesheet" href="../../../css/bibliotecario.css">
-
-    <!-- ICONOS -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/admin.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/bibliotecario.css')); ?>">
 </head>
 
 <body>
 
-<?php
-    /* Sidebar unificado */
-    $active = "dashboard";
-    include __DIR__ . "/sidebar.php";
-?>
+<?php include __DIR__ . '/../../components/sidebar.php'; ?>
+<?php include __DIR__ . '/../../components/topbar.php'; ?>
 
 <main class="content">
 

@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . "/../../../config/database.php";
-require_once __DIR__ . "/../../../config/env.php";
+require_once __DIR__ . '/../../lib/bootstrap.php';
+require_role(['administrador', 'bibliotecario']);
 
 $db = (new Database())->getConnection();
 
@@ -39,7 +39,7 @@ if ($action === "aprobar") {
     $db->prepare("UPDATE libros SET stock = stock - 1 WHERE id = ?")
        ->execute([$reserva['libro_id']]);
 
-    header("Location: bibliotecario_reservas.php");
+    header('Location: ' . url_for('app/staff/bibliotecario_reservas.php'));
     exit;
 }
 
@@ -60,7 +60,7 @@ if ($action === "finalizar") {
     $db->prepare("UPDATE libros SET stock = stock + 1 WHERE id = ?")
        ->execute([$reserva['libro_id']]);
 
-    header("Location: bibliotecario_reservas.php");
+    header('Location: ' . url_for('app/staff/bibliotecario_reservas.php'));
     exit;
 }
 
