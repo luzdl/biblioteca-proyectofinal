@@ -18,6 +18,14 @@ if ($busqueda !== "") {
             || str_contains(strtolower($libro["categoria"]), $q);
     });
 }
+
+/* Distribución simple en 3 repisas */
+$chunks = array_chunk(array_values($libros), max(1, ceil((count($libros) ?: 1)/3)));
+$shelves = [
+    "En lectura"  => $chunks[0] ?? [],
+    "Por leer"    => $chunks[1] ?? [],
+    "Finalizados" => $chunks[2] ?? [],
+];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -37,7 +45,8 @@ if ($busqueda !== "") {
     <?php include __DIR__ . '/components/sidebar.php'; ?>
     <?php include __DIR__ . '/components/topbar.php'; ?>
 
-    <div class="container">
+    <!-- WRAPPER con padding lateral propio para que nada quede detrás del sidebar -->
+    <div class="catalog-wrap">
         <!-- Buscador -->
         <form method="GET" class="search-box">
             <input type="text" name="q"
@@ -46,29 +55,55 @@ if ($busqueda !== "") {
             <button type="submit">Buscar</button>
         </form>
 
-        <h2 class="section-title">Libros disponibles</h2>
+        <h2 class="section-title">Mi biblioteca</h2>
 
-        <div class="book-grid">
+        <!-- ================== REPISAS ================== -->
+        <div class="shelves">
             <?php if (empty($libros)): ?>
                 <p>No se encontraron libros para la búsqueda seleccionada.</p>
             <?php endif; ?>
 
-            <?php foreach ($libros as $libro): ?>
-                <?php
-                    $book = $libro;
-                    if (($book['stock'] ?? 0) > 0) {
-                        if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'estudiante') {
-                            $extraHtml = '<a class="reserve-btn" href="reservar.php?id=' . intval($book['id']) . '">Reservar</a>';
-                        } else {
-                            $extraHtml = '<button class="reserve-btn needs-login" data-id="' . intval($book['id']) . '">Reservar</button>';
-                        }
-                    } else {
-                        $extraHtml = '<div class="reserve-disabled">No disponible</div>';
-                    }
-                ?>
-                <?php include __DIR__ . '/components/book_card.php'; ?>
+            <?php foreach ($shelves as $shelfTitle => $books): ?>
+            <section class="shelf-block">
+                <div class="shelf-header">
+                    <h3><?php echo htmlspecialchars($shelfTitle); ?></h3>
+                    <a class="shelf-link" href="#">Ver todo</a>
+                </div>
+
+                <div class="shelf-row">
+                    <?php foreach ($books as $book): ?>
+                        <article class="book-item">
+                            <div class="book-cover">
+                                <img src="<?php echo htmlspecialchars($book['imagen']); ?>"
+                                     alt="Portada de <?php echo htmlspecialchars($book['titulo']); ?>">
+                            </div>
+                            <div class="book-stand"></div>
+
+                            <div class="book-hover">
+                                <div class="meta">
+                                    <strong><?php echo htmlspecialchars($book['titulo']); ?></strong>
+                                    <span><?php echo htmlspecialchars($book['autor']); ?></span>
+                                </div>
+                                <?php if (($book['stock'] ?? 0) > 0): ?>
+                                  <?php if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'estudiante'): ?>
+                                    <a class="btn-reserve" href="reservar.php?id=<?php echo intval($book['id']); ?>">Reservar</a>
+                                  <?php else: ?>
+                                    <button class="btn-reserve needs-login" data-id="<?php echo intval($book['id']); ?>">Reservar</button>
+                                  <?php endif; ?>
+                                <?php else: ?>
+                                    <div class="reserve-disabled">No disponible</div>
+                                <?php endif; ?>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Madera de la repisa -->
+                <div class="wood-shelf"></div>
+            </section>
             <?php endforeach; ?>
         </div>
+        <!-- ============================================= -->
     </div>
 
     <?php include __DIR__ . '/components/modal.php'; ?>
