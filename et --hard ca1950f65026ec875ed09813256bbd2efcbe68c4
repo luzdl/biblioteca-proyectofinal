@@ -1,0 +1,27 @@
+[33mcommit ca1950f65026ec875ed09813256bbd2efcbe68c4[m
+tree 0503c875e7855b679b7ed2161a28ac70f97af944
+parent b311be69b8c6926784e109060e0dd464ede6948f
+parent 88a4827b42d07560b40c7e2db801e4ac5c60d892
+author Luz De León <luz-de-leon@outlook.com> 1765767243 -0500
+committer GitHub <noreply@github.com> 1765767243 -0500
+gpgsig -----BEGIN PGP SIGNATURE-----
+ 
+ wsFcBAABCAAQBQJpP3hLCRC1aQ7uu5UhlAAAALoQAI2W+wYVXRSuySF3K6+7IyNV
+ I/C2QGHS5WmWieAnTKQNx7vRJ7SxoPA5lJAsbfNTKV/xrnfDMjOPFnvqSLO9OaYn
+ 2v5WKOF0eP+J25oWNNxKV82341IlVcbuguKM9+LeolR400DJeutFNYJJDYMkkts9
+ ceQfIJ699LWOc4bcIySP+uhyCwKU06ECCOm6QH7pFKGvOZwqciosiDewV5YCXllP
+ gjZ+S2MNrM61WWPd0NdNFsHQ+GCU0EWh3IDaYPJdmuaztCvRaNw1XygQ7UAETecY
+ +QsgmEIi4mJoPT9c0ErXciaseaOeqTwfd/tytXgRby1P+tMbvg5dCsiy976qUp3Z
+ h4kdBL6EdwFZs9YvWz5OC/vDUPpdcYisB9wCm2e0pFfrdMM9phZqnyckXitb+q4i
+ R2yMwZ2J0BFUms/E3xbic/6Zy3+Iqwd3yBuKhaWiMdQJB8yU1baal25UcirQUbwH
+ UKD1aiumSCMh+2kna4V/a3zcQ+8hINPAD0adx8luCFVodsmn/XqZg10sIGrJIY/Y
+ njk16GDoqkd7AQzyXBfIfVIXdAmu13hirM1bNLz1saG6ShyjtwAhb5LdKXFL33IU
+ HX3B7OIbHLhwD1DJ5gwqFOG9b9gZaCU68xbBdQ0XLSgmkKz8jqFGZziD/5ZawShY
+ q0y9+Q3UcsGC7J0vCNUA
+ =42wH
+ -----END PGP SIGNATURE-----
+ 
+
+    Merge pull request #19 from luzdl/luz
+    
+    Luz
