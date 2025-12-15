@@ -76,6 +76,7 @@ $categorias = $stmt->fetchAll();
 <body>
 
 <?php include __DIR__ . '/../../components/sidebar.php'; ?>
+<?php include __DIR__ . '/../../components/topbar.php'; ?>
 
 <main class="content">
     <h1 class="title">Categorías de libros</h1>

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/lib/bootstrap.php';
 
 /* Libros simulados mientras no haya base de datos */
 $libros = [
@@ -35,57 +35,15 @@ $shelves = [
     <meta name="viewport" content="width=device-width,initial-scale=1">
 
     <!-- Estilos existentes -->
-    <link rel="stylesheet" href="../css/student.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link rel="stylesheet" href="../css/components/book_card.css">
-    <link rel="stylesheet" href="../css/topbar-dropdown.css">
-    <!-- NUEVO: estilos de repisas -->
-    <link rel="stylesheet" href="../css/catalog.css">
-
-    <!-- Iconos para el sidebar -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-
-    <!-- Compensación del sidebar (ajustada por breakpoints también en catalog.css) -->
-    <style>
-      /* Desktop amplio */
-      @media (min-width: 1201px){
-        body.has-sidebar { padding-left: 276px; padding-top: 16px; }
-      }
-      /* Tablet / desktop angosto: sidebar más cerca */
-      @media (min-width: 901px) and (max-width:1200px){
-        body.has-sidebar { padding-left: 240px; padding-top: 16px; }
-      }
-      /* Móvil / sidebar colapsado */
-      @media (max-width: 900px){
-        body.has-sidebar { padding-left: 88px; padding-top: 12px; }
-      }
-
-      .topbar{ position: sticky; top: 0; z-index: 50; background:#fff;
-               border-bottom:1px solid rgba(87,71,55,.15); }
-    </style>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/student.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/components.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/components/book_card.css')); ?>">
 </head>
 
-<body class="has-sidebar">
+<body>
 
     <?php include __DIR__ . '/components/sidebar.php'; ?>
-
-    <!-- Barra superior -->
-    <header class="topbar">
-        <div class="logo">Biblioteca Digital</div>
-
-        <nav class="menu">
-            <?php if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'estudiante'): ?>
-                <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/catalog.php') : 'app/student/catalog.php'); ?>" class="active">Catálogo</a>
-                <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/reservas.php') : 'app/student/reservas.php'); ?>">Mis reservas</a>
-                <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/historial.php') : 'app/student/historial.php'); ?>">Historial</a>
-            <?php else: ?>
-                <a href="catalog.php" class="active">Catálogo</a>
-                <a href="login.php" class="login-btn">Iniciar sesión</a>
-            <?php endif; ?>
-        </nav>
-
-        <?php include __DIR__ . '/components/topbar_dropdown.php'; ?>
-    </header>
+    <?php include __DIR__ . '/components/topbar.php'; ?>
 
     <!-- WRAPPER con padding lateral propio para que nada quede detrás del sidebar -->
     <div class="catalog-wrap">
