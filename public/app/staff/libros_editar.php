@@ -4,6 +4,63 @@ require_role(['administrador', 'bibliotecario']);
 
 $db = (new Database())->getConnection();
 
+function libros_portada_limit_bytes(): int
+{
+    $dir = __DIR__ . '/../../..' . '/img/portadas';
+    $max = 0;
+    if (is_dir($dir)) {
+        $files = glob($dir . '/*');
+        if (is_array($files)) {
+            foreach ($files as $f) {
+                if (is_file($f)) {
+                    $sz = @filesize($f);
+                    if (is_int($sz) && $sz > $max) {
+                        $max = $sz;
+                    }
+                }
+            }
+        }
+    }
+    $base = max($max, 2 * 1024 * 1024);
+    return (int)ceil($base * 1.25);
+}
+
+function libros_portada_mime_allowed(string $mime): bool
+{
+    $mime = strtolower(trim($mime));
+    return in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true);
+}
+
+function libros_has_column(PDO $db, string $table, string $column): bool
+{
+    try {
+        $stmt = $db->prepare("SHOW COLUMNS FROM {$table} LIKE :col");
+        $stmt->execute([':col' => $column]);
+        return (bool)$stmt->fetch();
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function libros_create_upload(PDO $db, array $archivo, int $usuarioId, string $storedName, string $relativePath, string $mime, int $sizeBytes, ?string $sha256): ?int
+{
+    try {
+        $stmt = $db->prepare('INSERT INTO uploads (usuario_id, original_name, stored_name, relative_path, mime_type, size_bytes, sha256) VALUES (:uid, :orig, :stored, :path, :mime, :size, :sha)');
+        $stmt->execute([
+            ':uid' => $usuarioId,
+            ':orig' => (string)($archivo['name'] ?? ''),
+            ':stored' => $storedName,
+            ':path' => $relativePath,
+            ':mime' => $mime,
+            ':size' => $sizeBytes,
+            ':sha' => $sha256,
+        ]);
+        return (int)$db->lastInsertId();
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
 /* Obtener ID del libro */
 if (!isset($_GET["id"])) {
     header('Location: ' . url_for('app/staff/libros.php'));
@@ -13,9 +70,34 @@ if (!isset($_GET["id"])) {
 $id = intval($_GET["id"]);
 
 /* Cargar datos del libro */
-$stmt = $db->prepare("
-    SELECT * FROM libros WHERE id = :id LIMIT 1
-");
+$hasUploadCol = libros_has_column($db, 'libros', 'portada_upload_id');
+
+if ($hasUploadCol) {
+    $stmt = $db->prepare("
+        SELECT
+            l.*,
+            u.relative_path AS portada_path
+        FROM libros l
+        LEFT JOIN uploads u ON u.id = l.portada_upload_id
+        WHERE l.id = :id
+        LIMIT 1
+    ");
+} else {
+    $stmt = $db->prepare("
+        SELECT
+            l.*,
+            (
+                SELECT u.relative_path
+                FROM uploads u
+                WHERE u.stored_name = l.portada
+                ORDER BY u.id DESC
+                LIMIT 1
+            ) AS portada_path
+        FROM libros l
+        WHERE l.id = :id
+        LIMIT 1
+    ");
+}
 $stmt->execute([":id" => $id]);
 $libro = $stmt->fetch();
 
@@ -42,6 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
 
         $portadaNueva = $libro["portada"]; // Mantener la actual
+        $portadaUploadId = $hasUploadCol ? (int)($libro['portada_upload_id'] ?? 0) : 0;
 
         /* ¿Subieron una nueva portada? */
         if (!empty($_FILES["portada"]["name"])) {
@@ -49,36 +132,101 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $archivo = $_FILES["portada"];
             $ext = strtolower(pathinfo($archivo["name"], PATHINFO_EXTENSION));
 
-            $nombreNuevo = uniqid("libro_") . "." . $ext;
+            $permitidas = ["jpg", "jpeg", "png", "webp"];
 
-            move_uploaded_file($archivo["tmp_name"], __DIR__ . "/../../img/portadas/" . $nombreNuevo);
+            if (($archivo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+                $mensaje = "No se pudo subir la imagen (error de carga).";
+            } elseif (!in_array($ext, $permitidas, true)) {
+                $mensaje = "Formato de imagen no permitido.";
+            } else {
+                $maxBytes = libros_portada_limit_bytes();
+                $sizeBytes = (int)($archivo['size'] ?? 0);
+                if ($sizeBytes <= 0) {
+                    $mensaje = "La imagen está vacía o no es válida.";
+                } elseif ($sizeBytes > $maxBytes) {
+                    $mensaje = "La imagen supera el tamaño permitido (" . number_format($maxBytes / 1048576, 2) . " MB).";
+                } else {
+                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                    $mime = (string)$finfo->file((string)($archivo['tmp_name'] ?? ''));
+                    if (!libros_portada_mime_allowed($mime)) {
+                        $mensaje = "Formato de imagen no permitido.";
+                    } else {
+                        $nombreNuevo = uniqid("libro_") . "." . $ext;
+                        $destDir = __DIR__ . "/../../.." . "/img/portadas/";
+                        if (!is_dir($destDir)) {
+                            @mkdir($destDir, 0775, true);
+                        }
+                        $destPath = $destDir . $nombreNuevo;
 
-            $portadaNueva = $nombreNuevo;
+                        $sha256 = null;
+                        try {
+                            $sha256 = hash_file('sha256', (string)($archivo['tmp_name'] ?? ''));
+                        } catch (Exception $e) {
+                            $sha256 = null;
+                        }
+
+                        if (!move_uploaded_file((string)$archivo["tmp_name"], $destPath)) {
+                            $mensaje = "No se pudo guardar la imagen en el servidor.";
+                        } else {
+                            $portadaNueva = $nombreNuevo;
+                            $relativePath = 'img/portadas/' . $nombreNuevo;
+                            $usuarioId = (int)($_SESSION['usuario_id'] ?? 0);
+                            $newUploadId = libros_create_upload($db, $archivo, $usuarioId, $nombreNuevo, $relativePath, $mime, $sizeBytes, $sha256);
+                            if ($hasUploadCol && $newUploadId) {
+                                $portadaUploadId = $newUploadId;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        /* Actualizar libro */
-        $sql = "UPDATE libros 
-                SET titulo = :titulo,
-                    autor = :autor,
-                    categoria_id = :categoria_id,
-                    descripcion = :descripcion,
-                    portada = :portada,
-                    stock = :stock
-                WHERE id = :id";
+        if ($mensaje === '') {
+            if ($hasUploadCol) {
+                $sql = "UPDATE libros
+                        SET titulo = :titulo,
+                            autor = :autor,
+                            categoria_id = :categoria_id,
+                            descripcion = :descripcion,
+                            portada = :portada,
+                            portada_upload_id = :portada_upload_id,
+                            stock = :stock
+                        WHERE id = :id";
+                $stmt = $db->prepare($sql);
+                $stmt->execute([
+                    ":titulo" => $titulo,
+                    ":autor" => $autor,
+                    ":categoria_id" => $categoria_id,
+                    ":descripcion" => $descripcion,
+                    ":portada" => $portadaNueva,
+                    ":portada_upload_id" => $portadaUploadId > 0 ? $portadaUploadId : null,
+                    ":stock" => $stock,
+                    ":id" => $id
+                ]);
+            } else {
+                $sql = "UPDATE libros
+                        SET titulo = :titulo,
+                            autor = :autor,
+                            categoria_id = :categoria_id,
+                            descripcion = :descripcion,
+                            portada = :portada,
+                            stock = :stock
+                        WHERE id = :id";
+                $stmt = $db->prepare($sql);
+                $stmt->execute([
+                    ":titulo" => $titulo,
+                    ":autor" => $autor,
+                    ":categoria_id" => $categoria_id,
+                    ":descripcion" => $descripcion,
+                    ":portada" => $portadaNueva,
+                    ":stock" => $stock,
+                    ":id" => $id
+                ]);
+            }
 
-        $stmt = $db->prepare($sql);
-        $stmt->execute([
-            ":titulo" => $titulo,
-            ":autor" => $autor,
-            ":categoria_id" => $categoria_id,
-            ":descripcion" => $descripcion,
-            ":portada" => $portadaNueva,
-            ":stock" => $stock,
-            ":id" => $id
-        ]);
-
-        header('Location: ' . url_for('app/staff/libros.php', ['editado' => 1]));
-        exit;
+            header('Location: ' . url_for('app/staff/libros.php', ['editado' => 1]));
+            exit;
+        }
     }
 }
 
@@ -137,8 +285,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <div class="field">
             <label>Portada actual</label>
-            <?php if ($libro['portada']): ?>
-                <img src="<?php echo htmlspecialchars(url_for('img/portadas/' . $libro['portada'])); ?>" class="edit-portada">
+            <?php
+                $portadaPath = (string)($libro['portada_path'] ?? '');
+                $portadaFile = (string)($libro['portada'] ?? '');
+                $imgUrl = '';
+                if ($portadaPath !== '') {
+                    $imgUrl = url_for(ltrim($portadaPath, '/'));
+                } elseif ($portadaFile !== '') {
+                    $imgUrl = url_for('img/portadas/' . ltrim($portadaFile, '/'));
+                }
+            ?>
+            <?php if ($imgUrl !== ''): ?>
+                <img src="<?php echo htmlspecialchars($imgUrl); ?>" class="edit-portada">
             <?php else: ?>
                 <p class="no-img">Sin portada</p>
             <?php endif; ?>

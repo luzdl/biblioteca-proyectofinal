@@ -4,6 +4,64 @@ require_role(['administrador', 'bibliotecario']);
 
 $db = (new Database())->getConnection();
 
+function libros_portada_limit_bytes(): int
+{
+    $dir = __DIR__ . '/../../..' . '/img/portadas';
+    $max = 0;
+    if (is_dir($dir)) {
+        $files = glob($dir . '/*');
+        if (is_array($files)) {
+            foreach ($files as $f) {
+
+                if (is_file($f)) {
+                    $sz = @filesize($f);
+                    if (is_int($sz) && $sz > $max) {
+                        $max = $sz;
+                    }
+                }
+            }
+        }
+    }
+    $base = max($max, 2 * 1024 * 1024);
+    return (int)ceil($base * 1.25);
+}
+
+function libros_portada_mime_allowed(string $mime): bool
+{
+    $mime = strtolower(trim($mime));
+    return in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true);
+}
+
+function libros_has_column(PDO $db, string $table, string $column): bool
+{
+    try {
+        $stmt = $db->prepare("SHOW COLUMNS FROM {$table} LIKE :col");
+        $stmt->execute([':col' => $column]);
+        return (bool)$stmt->fetch();
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function libros_create_upload(PDO $db, array $archivo, int $usuarioId, string $storedName, string $relativePath, string $mime, int $sizeBytes, ?string $sha256): ?int
+{
+    try {
+        $stmt = $db->prepare('INSERT INTO uploads (usuario_id, original_name, stored_name, relative_path, mime_type, size_bytes, sha256) VALUES (:uid, :orig, :stored, :path, :mime, :size, :sha)');
+        $stmt->execute([
+            ':uid' => $usuarioId,
+            ':orig' => (string)($archivo['name'] ?? ''),
+            ':stored' => $storedName,
+            ':path' => $relativePath,
+            ':mime' => $mime,
+            ':size' => $sizeBytes,
+            ':sha' => $sha256,
+        ]);
+        return (int)$db->lastInsertId();
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
 /* ==============================
    OBTENER CATEGORÍAS
    ============================== */
@@ -29,6 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
 
         $portadaNombre = null;
+        $portadaUploadId = null;
 
         if (!empty($_FILES["portada"]["name"])) {
             $archivo = $_FILES["portada"];
@@ -36,33 +95,83 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $permitidas = ["jpg", "jpeg", "png", "webp"];
 
-            if (!in_array($ext, $permitidas)) {
+            if (($archivo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+                $mensaje = "No se pudo subir la imagen (error de carga).";
+            } elseif (!in_array($ext, $permitidas, true)) {
                 $mensaje = "Formato de imagen no permitido.";
             } else {
-                $portadaNombre = uniqid("libro_") . "." . $ext;
-                move_uploaded_file(
-                    $archivo["tmp_name"],
-                    __DIR__ . "/../../img/portadas/" . $portadaNombre
-                );
+                $maxBytes = libros_portada_limit_bytes();
+                $sizeBytes = (int)($archivo['size'] ?? 0);
+                if ($sizeBytes <= 0) {
+                    $mensaje = "La imagen está vacía o no es válida.";
+                } elseif ($sizeBytes > $maxBytes) {
+                    $mensaje = "La imagen supera el tamaño permitido (" . number_format($maxBytes / 1048576, 2) . " MB).";
+                } else {
+                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                    $mime = (string)$finfo->file((string)($archivo['tmp_name'] ?? ''));
+                    if (!libros_portada_mime_allowed($mime)) {
+                        $mensaje = "Formato de imagen no permitido.";
+                    } else {
+                        $portadaNombre = uniqid("libro_") . "." . $ext;
+                        $destDir = __DIR__ . "/../../.." . "/img/portadas/";
+                        if (!is_dir($destDir)) {
+                            @mkdir($destDir, 0775, true);
+                        }
+                        $destPath = $destDir . $portadaNombre;
+
+                        $sha256 = null;
+                        try {
+                            $sha256 = hash_file('sha256', (string)($archivo['tmp_name'] ?? ''));
+                        } catch (Exception $e) {
+                            $sha256 = null;
+                        }
+
+                        if (!move_uploaded_file((string)$archivo["tmp_name"], $destPath)) {
+                            $mensaje = "No se pudo guardar la imagen en el servidor.";
+                        } else {
+                            $relativePath = 'img/portadas/' . $portadaNombre;
+                            $usuarioId = (int)($_SESSION['usuario_id'] ?? 0);
+                            $portadaUploadId = libros_create_upload($db, $archivo, $usuarioId, $portadaNombre, $relativePath, $mime, $sizeBytes, $sha256);
+                        }
+                    }
+                }
             }
         }
 
         if ($mensaje === "") {
-            $stmt = $db->prepare("
-                INSERT INTO libros
-                (titulo, autor, categoria_id, descripcion, portada, stock)
-                VALUES
-                (:titulo, :autor, :categoria_id, :descripcion, :portada, :stock)
-            ");
-
-            $stmt->execute([
-                ":titulo" => $titulo,
-                ":autor" => $autor,
-                ":categoria_id" => $categoria_id,
-                ":descripcion" => $descripcion,
-                ":portada" => $portadaNombre,
-                ":stock" => $stock
-            ]);
+            $hasUploadCol = libros_has_column($db, 'libros', 'portada_upload_id');
+            if ($hasUploadCol) {
+                $stmt = $db->prepare("
+                    INSERT INTO libros
+                    (titulo, autor, categoria_id, descripcion, portada, portada_upload_id, stock)
+                    VALUES
+                    (:titulo, :autor, :categoria_id, :descripcion, :portada, :portada_upload_id, :stock)
+                ");
+                $stmt->execute([
+                    ":titulo" => $titulo,
+                    ":autor" => $autor,
+                    ":categoria_id" => $categoria_id,
+                    ":descripcion" => $descripcion,
+                    ":portada" => $portadaNombre,
+                    ":portada_upload_id" => $portadaUploadId,
+                    ":stock" => $stock
+                ]);
+            } else {
+                $stmt = $db->prepare("
+                    INSERT INTO libros
+                    (titulo, autor, categoria_id, descripcion, portada, stock)
+                    VALUES
+                    (:titulo, :autor, :categoria_id, :descripcion, :portada, :stock)
+                ");
+                $stmt->execute([
+                    ":titulo" => $titulo,
+                    ":autor" => $autor,
+                    ":categoria_id" => $categoria_id,
+                    ":descripcion" => $descripcion,
+                    ":portada" => $portadaNombre,
+                    ":stock" => $stock
+                ]);
+            }
 
             header('Location: ' . url_for('app/staff/libros.php', ['creado' => 1]));
             exit;

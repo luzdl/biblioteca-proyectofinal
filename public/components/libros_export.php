@@ -13,7 +13,14 @@ if (!function_exists('libros_export_fetch')) {
                     l.stock,
                     c.nombre AS categoria,
                     l.created_at AS created_at,
-                    l.updated_at AS updated_at
+                    l.updated_at AS updated_at,
+                    (
+                        SELECT u.relative_path
+                        FROM uploads u
+                        WHERE u.stored_name = l.portada
+                        ORDER BY u.id DESC
+                        LIMIT 1
+                    ) AS portada_path
                 FROM libros l
                 INNER JOIN categorias_libros c ON c.id = l.categoria_id
                 ORDER BY l.titulo ASC
@@ -27,7 +34,14 @@ if (!function_exists('libros_export_fetch')) {
                     l.stock,
                     c.nombre AS categoria,
                     l.fecha_creacion AS created_at,
-                    l.fecha_actualizacion AS updated_at
+                    l.fecha_actualizacion AS updated_at,
+                    (
+                        SELECT u.relative_path
+                        FROM uploads u
+                        WHERE u.stored_name = l.portada
+                        ORDER BY u.id DESC
+                        LIMIT 1
+                    ) AS portada_path
                 FROM libros l
                 INNER JOIN categorias_libros c ON c.id = l.categoria_id
                 ORDER BY l.titulo ASC
@@ -39,7 +53,14 @@ if (!function_exists('libros_export_fetch')) {
                     l.autor,
                     l.portada,
                     l.stock,
-                    c.nombre AS categoria
+                    c.nombre AS categoria,
+                    (
+                        SELECT u.relative_path
+                        FROM uploads u
+                        WHERE u.stored_name = l.portada
+                        ORDER BY u.id DESC
+                        LIMIT 1
+                    ) AS portada_path
                 FROM libros l
                 INNER JOIN categorias_libros c ON c.id = l.categoria_id
                 ORDER BY l.titulo ASC
@@ -57,6 +78,9 @@ if (!function_exists('libros_export_fetch')) {
                     }
                     if (!array_key_exists('updated_at', $r)) {
                         $r['updated_at'] = null;
+                    }
+                    if (!array_key_exists('portada_path', $r)) {
+                        $r['portada_path'] = null;
                     }
                 }
                 unset($r);
@@ -117,8 +141,11 @@ if (!function_exists('libros_export_handle_export')) {
 
             foreach ($rows as $r) {
                 $portada = (string)($r['portada'] ?? '');
+                $portadaPath = (string)($r['portada_path'] ?? '');
                 $portadaUrl = '';
-                if ($portada !== '' && function_exists('url_for')) {
+                if ($portadaPath !== '' && function_exists('url_for')) {
+                    $portadaUrl = url_for(ltrim($portadaPath, '/'));
+                } elseif ($portada !== '' && function_exists('url_for')) {
                     $portadaUrl = url_for('img/portadas/' . ltrim($portada, '/'));
                 }
 
@@ -192,8 +219,11 @@ if (!function_exists('libros_export_handle_export')) {
 
         foreach ($rows as $r) {
             $portada = (string)($r['portada'] ?? '');
+            $portadaPath = (string)($r['portada_path'] ?? '');
             $portadaUrl = '';
-            if ($portada !== '' && function_exists('url_for')) {
+            if ($portadaPath !== '' && function_exists('url_for')) {
+                $portadaUrl = url_for(ltrim($portadaPath, '/'));
+            } elseif ($portada !== '' && function_exists('url_for')) {
                 $portadaUrl = url_for('img/portadas/' . ltrim($portada, '/'));
             }
 

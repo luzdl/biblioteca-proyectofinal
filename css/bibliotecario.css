@@ -123,8 +123,15 @@ body {
 }
 
 /* Tabla */
+.table-wrap{
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 .table {
     width: 100%;
+    min-width: 760px;
     border-collapse: collapse;
     background: white;
     border-radius: 12px;
@@ -201,8 +208,15 @@ body {
 
 /* Acciones */
 .actions {
-    display: flex;
-    gap: 10px;
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.table td:last-child{
+    white-space: nowrap;
+    width: 1%;
 }
 
 .btn-edit {
