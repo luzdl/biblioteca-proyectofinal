@@ -6,6 +6,7 @@ $db = (new Database())->getConnection();
 
 $mensaje = '';
 $tipoMensaje = '';
+$fieldErrors = [];
 
 // Get available roles
 $rolesStmt = $db->query("SELECT id, name FROM roles ORDER BY name");
@@ -52,11 +53,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     $errors = [];
-    if ($usuario === '') $errors[] = "El nombre de usuario es obligatorio.";
-    if ($email === '') $errors[] = "El email es obligatorio.";
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "El email no es válido.";
-    if ($rol === '') $errors[] = "Debe seleccionar un rol.";
-    if ($id === 0 && $password === '') $errors[] = "La contraseña es obligatoria para nuevos usuarios.";
+    if ($usuario === '') {
+        $fieldErrors['usuario'] = "El nombre de usuario es obligatorio.";
+        $errors[] = $fieldErrors['usuario'];
+    }
+    if ($email === '') {
+        $fieldErrors['email'] = "El email es obligatorio.";
+        $errors[] = $fieldErrors['email'];
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $fieldErrors['email'] = "El email no es válido.";
+        $errors[] = $fieldErrors['email'];
+    }
+    if ($rol === '') {
+        $fieldErrors['rol'] = "Debe seleccionar un rol.";
+        $errors[] = $fieldErrors['rol'];
+    }
+    if ($id === 0 && $password === '') {
+        $fieldErrors['password'] = "La contraseña es obligatoria para nuevos usuarios.";
+        $errors[] = $fieldErrors['password'];
+    }
 
     if (!empty($errors)) {
         $mensaje = implode(' ', $errors);
@@ -81,6 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $checkStmt->execute($params);
             
             if ($checkStmt->fetch()) {
+                $fieldErrors['usuario'] = "Ya existe un usuario con ese nombre.";
+                $fieldErrors['email'] = "Ya existe un usuario con ese email.";
                 $mensaje = "Ya existe un usuario con ese nombre o email.";
                 $tipoMensaje = "error";
                 $usuarioEditar = ['id' => $id, 'usuario' => $usuario, 'email' => $email, 'rol' => $rol];
@@ -166,13 +183,14 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Usuarios | Biblioteca Digital</title>
     <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/sidebar.css')); ?>">
     <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/admin.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/admin_usuarios.css')); ?>">
 </head>
 <body>
 
 <?php include __DIR__ . '/../../components/sidebar.php'; ?>
 <?php include __DIR__ . '/../../components/topbar.php'; ?>
 
-<main class="content">
+<main class="content usuarios-page">
     <h1 class="title">Gestión de usuarios</h1>
 
     <?php if ($mensaje): ?>
@@ -184,27 +202,36 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <section class="form-section">
         <h2><?php echo $usuarioEditar ? 'Editar usuario' : 'Nuevo usuario'; ?></h2>
 
-        <form method="post" action="" class="crud-form">
+        <form method="post" action="" class="crud-form usuarios-form">
             <input type="hidden" name="id" value="<?php echo $usuarioEditar['id'] ?? 0; ?>">
             
-            <label>
-                Nombre de usuario:
-                <input type="text" name="usuario" value="<?php echo htmlspecialchars($usuarioEditar['usuario'] ?? ''); ?>" required>
+            <label class="usuarios-field">
+                <span class="usuarios-label">Nombre de usuario:<span class="usuarios-required">*</span></span>
+                <input class="usuarios-input <?php echo isset($fieldErrors['usuario']) ? 'usuarios-input--error' : ''; ?>" type="text" name="usuario" value="<?php echo htmlspecialchars($usuarioEditar['usuario'] ?? ''); ?>" required <?php echo isset($fieldErrors['usuario']) ? 'aria-invalid="true"' : ''; ?>>
+                <?php if (isset($fieldErrors['usuario'])): ?>
+                    <small class="usuarios-error"><?php echo htmlspecialchars($fieldErrors['usuario']); ?></small>
+                <?php endif; ?>
             </label>
 
-            <label>
-                Email:
-                <input type="email" name="email" value="<?php echo htmlspecialchars($usuarioEditar['email'] ?? ''); ?>" required>
+            <label class="usuarios-field">
+                <span class="usuarios-label">Email:<span class="usuarios-required">*</span></span>
+                <input class="usuarios-input <?php echo isset($fieldErrors['email']) ? 'usuarios-input--error' : ''; ?>" type="email" name="email" value="<?php echo htmlspecialchars($usuarioEditar['email'] ?? ''); ?>" required <?php echo isset($fieldErrors['email']) ? 'aria-invalid="true"' : ''; ?>>
+                <?php if (isset($fieldErrors['email'])): ?>
+                    <small class="usuarios-error"><?php echo htmlspecialchars($fieldErrors['email']); ?></small>
+                <?php endif; ?>
             </label>
 
-            <label>
-                Contraseña<?php echo $usuarioEditar ? ' (dejar vacío para no cambiar)' : ''; ?>:
-                <input type="password" name="password" <?php echo $usuarioEditar ? '' : 'required'; ?>>
+            <label class="usuarios-field">
+                <span class="usuarios-label">Contraseña<?php echo $usuarioEditar ? ' (dejar vacío para no cambiar)' : ':<span class="usuarios-required">*</span>'; ?></span>
+                <input class="usuarios-input <?php echo isset($fieldErrors['password']) ? 'usuarios-input--error' : ''; ?>" type="password" name="password" <?php echo $usuarioEditar ? '' : 'required'; ?> <?php echo isset($fieldErrors['password']) ? 'aria-invalid="true"' : ''; ?>>
+                <?php if (isset($fieldErrors['password'])): ?>
+                    <small class="usuarios-error"><?php echo htmlspecialchars($fieldErrors['password']); ?></small>
+                <?php endif; ?>
             </label>
 
-            <label>
-                Rol:
-                <select name="rol" required>
+            <label class="usuarios-field">
+                <span class="usuarios-label">Rol:<span class="usuarios-required">*</span></span>
+                <select class="usuarios-select <?php echo isset($fieldErrors['rol']) ? 'usuarios-select--error' : ''; ?>" name="rol" required <?php echo isset($fieldErrors['rol']) ? 'aria-invalid="true"' : ''; ?>>
                     <option value="">-- Seleccionar rol --</option>
                     <?php foreach ($roles as $r): ?>
                         <option value="<?php echo htmlspecialchars($r['name']); ?>" <?php echo ($usuarioEditar['rol'] ?? '') === $r['name'] ? 'selected' : ''; ?>>
@@ -212,12 +239,15 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <?php if (isset($fieldErrors['rol'])): ?>
+                    <small class="usuarios-error"><?php echo htmlspecialchars($fieldErrors['rol']); ?></small>
+                <?php endif; ?>
             </label>
 
-            <div class="form-actions">
-                <button type="submit"><?php echo $usuarioEditar ? 'Actualizar' : 'Crear usuario'; ?></button>
+            <div class="form-actions usuarios-actions">
+                <button class="usuarios-btn usuarios-btn--primary" type="submit"><?php echo $usuarioEditar ? 'Actualizar' : 'Crear usuario'; ?></button>
                 <?php if ($usuarioEditar): ?>
-                    <a href="<?php echo htmlspecialchars(url_for('app/admin/usuarios.php')); ?>" class="btn-cancel">Cancelar</a>
+                    <a href="<?php echo htmlspecialchars(url_for('app/admin/usuarios.php')); ?>" class="usuarios-btn usuarios-btn--ghost">Cancelar</a>
                 <?php endif; ?>
             </div>
         </form>
@@ -229,7 +259,7 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php if (count($usuarios) === 0): ?>
             <p>No hay usuarios registrados.</p>
         <?php else: ?>
-            <table class="crud-table">
+            <table class="crud-table usuarios-table">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -246,11 +276,11 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td><?php echo htmlspecialchars($u['usuario']); ?></td>
                         <td><?php echo htmlspecialchars($u['email']); ?></td>
                         <td><?php echo htmlspecialchars(ucfirst($u['rol'])); ?></td>
-                        <td>
-                            <a href="<?php echo htmlspecialchars(url_for('app/admin/usuarios.php', ['editar' => $u['id']])); ?>">Editar</a>
+                        <td class="usuarios-table-actions">
+                            <a class="usuarios-link" href="<?php echo htmlspecialchars(url_for('app/admin/usuarios.php', ['editar' => $u['id']])); ?>">Editar</a>
                             <?php if ((int)$u['id'] !== (int)($_SESSION['usuario_id'] ?? 0)): ?>
                             |
-                            <a href="<?php echo htmlspecialchars(url_for('app/admin/usuarios.php', ['eliminar' => $u['id']])); ?>"
+                            <a class="usuarios-link" href="<?php echo htmlspecialchars(url_for('app/admin/usuarios.php', ['eliminar' => $u['id']])); ?>"
                                onclick="return confirm('¿Seguro que deseas eliminar este usuario?');">
                                Eliminar
                             </a>

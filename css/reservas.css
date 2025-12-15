@@ -3,74 +3,35 @@
 ------------------------------------ */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
+:root{
+    --rose:#D38F7A;
+    --mustard:#B99145;
+    --coffee:#574737;
+    --sage:#A5AF89;
+    --terracotta:#C7764A;
+    --blush:#E6C8B1;
+}
+
 body {
     margin: 0;
     padding: 0;
     font-family: "Inter", sans-serif;
     background: #f4f2ef;
-    color: #2e2e2e;
+    color: var(--coffee);
 }
 
-/* ------------------------------------
-   PANEL LATERAL
------------------------------------- */
-.sidebar {
-    width: 260px;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    background: #ffffff;
-    padding: 40px 30px;
-    box-shadow: 4px 0 18px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
 
-.sidebar .logo {
-    font-size: 28px;
-    font-weight: 700;
-    color: #b7874b;
-    margin-bottom: 40px;
-}
-
-.sidebar nav {
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-}
-
-.sidebar nav a {
-    text-decoration: none;
-    font-size: 18px;
-    color: #4d4d4d;
-    padding: 10px 14px;
-    border-radius: 12px;
-    transition: 0.25s;
-}
-
-.sidebar nav a:hover {
-    background: #f0e8df;
-}
-
-.sidebar nav a.active {
-    background: #e7dbc8;
-    font-weight: 600;
-}
-
-.sidebar .logout {
-    color: #b2554d;
-    font-weight: 600;
-    margin-bottom: 40px;
-}
 
 /* ------------------------------------
    CONTENIDO PRINCIPAL
 ------------------------------------ */
 .main {
-    margin-left: 300px;
-    padding: 50px 70px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (max-width: 900px){
+    .main{ padding: 12px 20px 24px; }
 }
 
 .main h1 {
