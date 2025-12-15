@@ -32,7 +32,7 @@ try {
     }
     
     // Verificar si el usuario ya tiene una reserva activa para este libro
-    $stmt = $db->prepare("SELECT id FROM reservas WHERE usuario_id = ? AND libro_id = ? AND estado IN ('pendiente', 'aprobado') LIMIT 1");
+    $stmt = $db->prepare("SELECT id FROM reservas WHERE usuario_id = ? AND libro_id = ? AND estado IN ('pendiente', 'aprobado', 'en curso', 'en_curso') LIMIT 1");
     $stmt->execute([$_SESSION['usuario_id'], $id]);
     
     if ($stmt->fetch()) {
