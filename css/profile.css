@@ -19,7 +19,7 @@
 
 main.content {
     
-    padding-left: 28px; /* ← un tilín a la derecha */
+    padding-left: 10px; /* ← un tilín a la derecha */
     padding-right: 24px;
     padding-bottom: 40px;
     box-sizing: border-box;
