@@ -4,6 +4,11 @@ require_role(['administrador', 'bibliotecario']);
 
 $db = (new Database())->getConnection();
 
+require_once __DIR__ . '/../../components/libros_export.php';
+if (function_exists('libros_export_handle_export')) {
+    libros_export_handle_export($db, ['page_path' => 'app/staff/libros.php']);
+}
+
 $mensaje = '';
 $tipoMensaje = '';
 
@@ -85,7 +90,10 @@ $libros = $db->query($query)->fetchAll();
 
     <div class="top-bar">
         <h1 class="page-title">Gestión de Libros</h1>
-        <a href="<?php echo htmlspecialchars(url_for('app/staff/libros_crear.php')); ?>" class="btn-add">+ Añadir libro</a>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <a href="<?php echo htmlspecialchars(url_for('app/staff/libros.php', ['export_libros' => 1, 'format' => 'xls'])); ?>" class="btn-add">Exportar (Excel)</a>
+            <a href="<?php echo htmlspecialchars(url_for('app/staff/libros_crear.php')); ?>" class="btn-add">+ Añadir libro</a>
+        </div>
     </div>
 
     <?php if ($mensaje): ?>
