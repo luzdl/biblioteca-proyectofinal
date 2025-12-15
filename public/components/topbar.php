@@ -29,6 +29,7 @@ if ($topbarRole === 'administrador') {
         ['label' => 'Roles', 'href' => _tb_url('app/admin/roles.php')],
         ['label' => 'Categorías', 'href' => _tb_url('app/admin/categorias.php')],
         ['label' => 'Carreras', 'href' => _tb_url('app/admin/carreras.php')],
+        ['label' => 'Reportes', 'href' => _tb_url('app/reportes/reservas.php')],
     ];
 } elseif ($topbarRole === 'bibliotecario') {
     $topbarLinks = [
@@ -36,6 +37,7 @@ if ($topbarRole === 'administrador') {
         ['label' => 'Libros', 'href' => _tb_url('app/staff/libros.php')],
         ['label' => 'Categorías', 'href' => _tb_url('app/staff/categorias.php')],
         ['label' => 'Reservas', 'href' => _tb_url('app/staff/bibliotecario_reservas.php')],
+        ['label' => 'Reportes', 'href' => _tb_url('app/reportes/reservas.php')],
     ];
 } elseif ($topbarRole === 'estudiante') {
     $topbarLinks = [
