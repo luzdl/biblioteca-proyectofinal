@@ -1,12 +1,12 @@
 <?php
-session_start();
+require_once __DIR__ . '/../../lib/bootstrap.php';
+require_role(['estudiante']);
 
-/* Libros simulados mientras no haya base de datos */
 $libros = [
-    ["id"=>1,"titulo"=>"Cien años de soledad","autor"=>"Gabriel García Márquez","categoria"=>"Novela","stock"=>4,"imagen"=>"../img/libro1.jpg"],
-    ["id"=>2,"titulo"=>"1984","autor"=>"George Orwell","categoria"=>"Distopía","stock"=>0,"imagen"=>"../img/libro2.jpg"],
-    ["id"=>3,"titulo"=>"El principito","autor"=>"Antoine de Saint-Exupéry","categoria"=>"Fábula","stock"=>7,"imagen"=>"../img/libro3.jpg"],
-    ["id"=>4,"titulo"=>"Don Quijote de la Mancha","autor"=>"Miguel de Cervantes","categoria"=>"Clásico","stock"=>2,"imagen"=>"../img/libro4.jpg"],
+    ["id"=>1,"titulo"=>"Cien años de soledad","autor"=>"Gabriel García Márquez","categoria"=>"Novela","stock"=>4,"imagen"=>url_for('img/libro1.jpg')],
+    ["id"=>2,"titulo"=>"1984","autor"=>"George Orwell","categoria"=>"Distopía","stock"=>0,"imagen"=>url_for('img/libro2.jpg')],
+    ["id"=>3,"titulo"=>"El principito","autor"=>"Antoine de Saint-Exupéry","categoria"=>"Fábula","stock"=>7,"imagen"=>url_for('img/libro3.jpg')],
+    ["id"=>4,"titulo"=>"Don Quijote de la Mancha","autor"=>"Miguel de Cervantes","categoria"=>"Clásico","stock"=>2,"imagen"=>url_for('img/libro4.jpg')],
 ];
 
 $busqueda = $_GET["q"] ?? "";
@@ -19,8 +19,8 @@ if ($busqueda !== "") {
     });
 }
 
-/* Distribución simple en 3 repisas (si mañana tienes estados reales, cámbialo aquí) */
-$chunks = array_chunk(array_values($libros), max(1, ceil(count($libros)/3)));
+/* Distribución simple en 3 repisas */
+$chunks = array_chunk(array_values($libros), max(1, ceil((count($libros) ?: 1)/3)));
 $shelves = [
     "En lectura"  => $chunks[0] ?? [],
     "Por leer"    => $chunks[1] ?? [],
@@ -34,50 +34,18 @@ $shelves = [
     <title>Biblioteca | Catálogo</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
 
-    <!-- Estilos existentes -->
-    <link rel="stylesheet" href="../css/student.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link rel="stylesheet" href="../css/components/book_card.css">
-    <link rel="stylesheet" href="../css/topbar-dropdown.css">
-    <!-- NUEVO: estilos de repisas -->
-    <link rel="stylesheet" href="../css/catalog.css">
-
-    <!-- Iconos para el sidebar -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-
-    <!-- Ajustes mínimos para convivir con el sidebar -->
-    <style>
-      body.has-sidebar { padding-left: 276px; padding-top: 16px; }
-      @media (max-width: 900px){ body.has-sidebar { padding-left: 88px; } }
-      .topbar{ position: sticky; top: 0; z-index: 50; background:#fff;
-               border-bottom:1px solid rgba(87,71,55,.15); }
-      .container{ padding-top: 16px; }
-    </style>
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/student.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/components.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/components/book_card.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/catalog.css')); ?>">
 </head>
 
-<body class="has-sidebar">
+<body>
 
-    <?php include __DIR__ . '/components/sidebar.php'; ?>
+    <?php include __DIR__ . '/../../components/sidebar.php'; ?>
+    <?php include __DIR__ . '/../../components/topbar.php'; ?>
 
-    <!-- Barra superior -->
-    <header class="topbar">
-        <div class="logo">Biblioteca Digital</div>
-
-        <nav class="menu">
-            <?php if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'estudiante'): ?>
-                <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/catalog.php') : 'app/student/catalog.php'); ?>" class="active">Catálogo</a>
-                <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/reservas.php') : 'app/student/reservas.php'); ?>">Mis reservas</a>
-                <a href="<?php echo htmlspecialchars(function_exists('url_for') ? url_for('app/student/historial.php') : 'app/student/historial.php'); ?>">Historial</a>
-            <?php else: ?>
-                <a href="catalog.php" class="active">Catálogo</a>
-                <a href="login.php" class="login-btn">Iniciar sesión</a>
-            <?php endif; ?>
-        </nav>
-
-        <?php include __DIR__ . '/components/topbar_dropdown.php'; ?>
-    </header>
-
-    <div class="container">
+    <div class="catalog-wrap">
         <!-- Buscador -->
         <form method="GET" class="search-box">
             <input type="text" name="q"
@@ -137,7 +105,7 @@ $shelves = [
         <!-- ============================================= -->
     </div>
 
-    <?php include __DIR__ . '/components/modal.php'; ?>
+    <?php include __DIR__ . '/../../components/modal.php'; ?>
 
     <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -149,7 +117,7 @@ $shelves = [
                     title: 'Inicia sesión para reservar',
                     body: 'Debes iniciar sesión para poder realizar la reserva. ¿Deseas ir a iniciar sesión o registrarte ahora?',
                     confirmText: 'Ir a iniciar sesión',
-                    onConfirm: function(){ window.location.href = 'login.php?next=' + next; }
+                    onConfirm: function(){ window.location.href = '../../login.php?next=' + next; }
                 });
             });
         });
