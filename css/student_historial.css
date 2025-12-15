@@ -1,0 +1,19 @@
+.historial-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1em;
+}
+
+.historial-table th, .historial-table td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.historial-table th {
+    background-color: #f4f4f4;
+}
+
+.historial-table img {
+    border-radius: 4px;
+}
