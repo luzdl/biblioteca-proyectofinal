@@ -2,20 +2,33 @@
 require_once __DIR__ . '/../../lib/bootstrap.php';
 require_role(['estudiante']);
 
-$historial = [
-    [
-        'titulo' => 'Cien años de soledad',
-        'autor' => 'García Márquez',
-        'fecha' => '2024-01-12',
-        'imagen' => url_for('img/libro1.jpg'),
-    ],
-    [
-        'titulo' => 'El Señor de los Anillos',
-        'autor' => 'J.R.R. Tolkien',
-        'fecha' => '2024-02-01',
-        'imagen' => url_for('img/libro_lotr.jpg'),
-    ],
-];
+$db = (new Database())->getConnection();
+
+$historial = [];
+try {
+    $stmt = $db->prepare(
+        "SELECT
+            r.id,
+            r.estado,
+            r.fecha_reserva,
+            r.fecha_devolucion,
+            l.titulo,
+            l.autor,
+            l.portada AS imagen
+         FROM reservas r
+         INNER JOIN libros l ON l.id = r.libro_id
+         WHERE r.usuario_id = :usuario_id
+           AND (
+                r.fecha_devolucion IS NOT NULL
+                OR r.estado IN ('finalizado', 'cancelado')
+           )
+         ORDER BY COALESCE(r.fecha_devolucion, r.fecha_reserva) DESC, r.id DESC"
+    );
+    $stmt->execute([':usuario_id' => (int)$_SESSION['usuario_id']]);
+    $historial = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+} catch (Exception $e) {
+    $historial = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -38,14 +51,44 @@ $historial = [
 
     <div class="books-row">
 
+        <?php if (count($historial) === 0): ?>
+            <p>No tienes historial aún.</p>
+        <?php endif; ?>
+
         <?php foreach ($historial as $h): ?>
             <?php
+                $imagen = $h['imagen'] ?? '';
+                if (is_string($imagen) && $imagen !== '') {
+                    if (stripos($imagen, 'http://') === 0 || stripos($imagen, 'https://') === 0) {
+                        $imagenUrl = $imagen;
+                    } elseif (strpos($imagen, '/') !== false) {
+                        $imagenUrl = url_for(ltrim($imagen, '/'));
+                    } else {
+                        $imagenUrl = url_for('img/portadas/' . ltrim($imagen, '/'));
+                    }
+                } else {
+                    $imagenUrl = url_for('img/default-book.png');
+                }
+
                 $book = [
-                    'imagen' => $h['imagen'],
-                    'titulo' => $h['titulo'],
-                    'autor'  => $h['autor'],
+                    'imagen' => $imagenUrl,
+                    'titulo' => $h['titulo'] ?? '',
+                    'autor'  => $h['autor'] ?? '',
                 ];
-                $extraHtml = '<p class="estado">Fecha: ' . htmlspecialchars($h['fecha']) . '</p>';
+
+                $estado = (string)($h['estado'] ?? '');
+                $estadoClass = strtolower(str_replace(' ', '', $estado));
+                $extraHtml = '<p class="estado estado-' . $estadoClass . '">' . htmlspecialchars($estado) . '</p>';
+
+                $fechaBase = $h['fecha_devolucion'] ?: ($h['fecha_reserva'] ?? null);
+                $fechaTxt = '';
+                if ($fechaBase) {
+                    $fechaTxt = date('d/m/Y', strtotime((string)$fechaBase));
+                }
+                if ($fechaTxt !== '') {
+                    $label = $h['fecha_devolucion'] ? 'Devuelto' : 'Reservado';
+                    $extraHtml .= '<p class="estado">' . $label . ': ' . htmlspecialchars($fechaTxt) . '</p>';
+                }
             ?>
             <?php include __DIR__ . '/../../components/book_card.php'; ?>
         <?php endforeach; ?>

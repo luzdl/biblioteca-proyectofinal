@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+<<<<<<< HEAD
 // Verificar que el usuario sea estudiante
 if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'estudiante') {
     header("Location: ../../login.php");
@@ -120,6 +121,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancelar_reserva'])) 
 // Función auxiliar para URLs (si no la tienes en otro lugar)
 function url_for($path) {
     return '/biblioteca-proyectofinal/public/' . $path;
+=======
+$db = (new Database())->getConnection();
+
+$reservas = [];
+try {
+    $stmt = $db->prepare(
+        "SELECT
+            r.id,
+            r.estado,
+            r.fecha_reserva,
+            l.titulo,
+            l.autor,
+            l.portada AS imagen
+         FROM reservas r
+         INNER JOIN libros l ON l.id = r.libro_id
+         WHERE r.usuario_id = :usuario_id
+           AND r.estado <> 'cancelado'
+         ORDER BY r.fecha_reserva DESC"
+    );
+    $stmt->execute([':usuario_id' => (int)$_SESSION['usuario_id']]);
+    $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+} catch (Exception $e) {
+    $reservas = [];
+>>>>>>> 359ebd94ef92d7aad10cd8b9496c571ce938981b
 }
 ?>
 <!DOCTYPE html>
@@ -169,6 +194,7 @@ function url_for($path) {
 
         <div class="books-row">
 
+<<<<<<< HEAD
             <?php if (empty($reservas)): ?>
                 <p class="no-reservas" style="padding: 20px; text-align: center; color: #666;">
                     No tienes reservas activas en este momento.
@@ -201,6 +227,39 @@ function url_for($path) {
                     <?php include __DIR__ . '/../../components/book_card.php'; ?>
                 <?php endforeach; ?>
             <?php endif; ?>
+=======
+            <?php if (count($reservas) === 0): ?>
+                <p>No tienes reservas aún.</p>
+            <?php endif; ?>
+
+            <?php foreach ($reservas as $reserva): ?>
+                <?php
+                    $imagen = $reserva['imagen'] ?? '';
+                    if (is_string($imagen) && $imagen !== '') {
+                        if (stripos($imagen, 'http://') === 0 || stripos($imagen, 'https://') === 0) {
+                            $imagenUrl = $imagen;
+                        } else {
+                            $imagenUrl = url_for(ltrim($imagen, '/'));
+                        }
+                    } else {
+                        $imagenUrl = url_for('img/user_placeholder.png');
+                    }
+
+                    $book = [
+                        'imagen' => $imagenUrl,
+                        'titulo' => $reserva['titulo'],
+                        'autor'  => $reserva['autor'],
+                    ];
+                    $estadoClass = strtolower(str_replace(' ', '', $reserva['estado']));
+                    $extraHtml = '<p class="estado estado-' . $estadoClass . '">' . htmlspecialchars($reserva['estado']) . '</p>';
+
+                    if (in_array($reserva['estado'], ['pendiente', 'aprobado', 'en curso'], true)) {
+                        $extraHtml .= '<a href="cancelar_reserva.php?id=' . intval($reserva['id']) . '" class="cancel-btn">Cancelar reserva</a>';
+                    }
+                ?>
+                <?php include __DIR__ . '/../../components/book_card.php'; ?>
+            <?php endforeach; ?>
+>>>>>>> 359ebd94ef92d7aad10cd8b9496c571ce938981b
 
         </div>
 
@@ -208,6 +267,34 @@ function url_for($path) {
     </section>
 
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('a.cancel-btn').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+            e.preventDefault();
+            var href = this.getAttribute('href');
+            if (!href) {
+                return;
+            }
+
+            Swal.fire({
+                title: '¿Está seguro de cancelar su reserva?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, cancelar',
+                cancelButtonText: 'No'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    window.location.href = href;
+                }
+            });
+        });
+    });
+});
+</script>
 
 </body>
 </html>
