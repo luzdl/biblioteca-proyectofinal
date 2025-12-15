@@ -190,10 +190,6 @@ if ($topbarRole === 'administrador') {
 
 <header class="topbar" role="banner">
   <div class="tb-left">
-    <button type="button" class="tb-icon-btn" id="tbToggleSidebar" aria-label="Abrir menú">
-      <span class="material-symbols-outlined" aria-hidden="true">menu</span>
-    </button>
-
     <a class="tb-brand" href="<?php echo htmlspecialchars(_tb_url($topbarIsLoggedIn ? 'dashboard.php' : 'catalog.php')); ?>">Biblioteca Digital</a>
 
     <nav class="tb-menu" aria-label="Navegación superior">
@@ -224,12 +220,5 @@ if ($topbarRole === 'administrador') {
 <script>
   (function(){
     document.body.classList.add('has-topbar');
-    var btn = document.getElementById('tbToggleSidebar');
-    if (!btn) return;
-    btn.addEventListener('click', function(){
-      var sb = document.querySelector('.sidebar');
-      if (!sb) return;
-      sb.classList.toggle('is-open');
-    });
   })();
 </script>
