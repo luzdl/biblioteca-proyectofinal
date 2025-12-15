@@ -140,6 +140,7 @@ $roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
 
 <?php include __DIR__ . '/../../components/sidebar.php'; ?>
+<?php include __DIR__ . '/../../components/topbar.php'; ?>
 
 <main class="content">
     <h1 class="title">Gestión de roles</h1>

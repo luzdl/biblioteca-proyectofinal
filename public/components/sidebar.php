@@ -1,6 +1,7 @@
 <?php
 
 $sidebarRole = (string)($_SESSION['usuario_rol'] ?? '');
+$isLoggedIn = isset($_SESSION['usuario_usuario']) && (string)$_SESSION['usuario_usuario'] !== '';
 $username = htmlspecialchars($_SESSION['usuario_usuario'] ?? '');
 $currentPath = (string)(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '');
 $currentPath = ltrim($currentPath, '/');
@@ -34,15 +35,23 @@ function _sb_active(string $path): bool
     --sb-radius: 18px;
   }
 
+  body{
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+
   /* ====== Shim de layout: reserva espacio para que navbar y main no se tapen ====== */
   body.has-sidebar{
-    /* Reserva ancho máximo para evitar que el contenido “salte” al expandir */
+    padding-left: calc(var(--sb-width-collapsed) + 16px);
+  }
+  body.has-sidebar.sidebar-expanded{
     padding-left: calc(var(--sb-width-expanded) + 16px);
-    padding-top: 16px; /* separa del borde superior si tu navbar es sticky */
   }
   @media (max-width: 900px){
     body.has-sidebar{
       padding-left: calc(var(--sb-width-collapsed) + 16px);
+    }
+    body.has-sidebar.sidebar-expanded{
+      padding-left: calc(var(--sb-width-expanded) + 16px);
     }
   }
   /* Si usas una topbar con esta clase, garantizamos que quede por encima */
@@ -62,6 +71,11 @@ function _sb_active(string $path): bool
     overflow: hidden;
     display: flex; flex-direction: column;
     z-index: 20; /* menor que .top-navbar (50) */
+  }
+
+  body.has-topbar .sidebar{
+    top: calc(var(--tb-height, 72px) + 16px);
+    height: calc(100vh - var(--tb-height, 72px) - 32px);
   }
   .sidebar:hover,
   .sidebar:focus-within,
@@ -172,7 +186,30 @@ function _sb_active(string $path): bool
 
   <nav class="sidebar-menu" role="navigation">
 
-    <?php if ($sidebarRole === 'administrador'): ?>
+    <?php if (!$isLoggedIn): ?>
+      <a class="menu-link <?php echo _sb_active('public/catalog.php') || _sb_active('catalog.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('catalog.php')); ?>"
+         data-tooltip="Catálogo" aria-label="Catálogo">
+        <span class="material-symbols-outlined" aria-hidden="true">local_library</span>
+        <span class="menu-label">Catálogo</span>
+      </a>
+
+      <a class="menu-link <?php echo _sb_active('public/login.php') || _sb_active('login.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('login.php')); ?>"
+         data-tooltip="Iniciar sesión" aria-label="Iniciar sesión">
+        <span class="material-symbols-outlined" aria-hidden="true">login</span>
+        <span class="menu-label">Iniciar sesión</span>
+      </a>
+
+      <a class="menu-link <?php echo _sb_active('public/registro.php') || _sb_active('registro.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('registro.php')); ?>"
+         data-tooltip="Registrarse" aria-label="Registrarse">
+        <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+        <span class="menu-label">Registrarse</span>
+      </a>
+    <?php endif; ?>
+
+    <?php if ($isLoggedIn && $sidebarRole === 'administrador'): ?>
       <a class="menu-link <?php echo _sb_active('public/app/admin/index.php') || _sb_active('app/admin/index.php') ? 'active' : ''; ?>"
          href="<?php echo htmlspecialchars(_sb_url('app/admin/index.php')); ?>"
          data-tooltip="Panel" aria-label="Panel">
@@ -209,7 +246,7 @@ function _sb_active(string $path): bool
       </a>
     <?php endif; ?>
 
-    <?php if ($sidebarRole === 'bibliotecario'): ?>
+    <?php if ($isLoggedIn && $sidebarRole === 'bibliotecario'): ?>
       <a class="menu-link <?php echo _sb_active('public/app/staff/index.php') || _sb_active('app/staff/index.php') ? 'active' : ''; ?>"
          href="<?php echo htmlspecialchars(_sb_url('app/staff/index.php')); ?>"
          data-tooltip="Panel" aria-label="Panel">
@@ -225,7 +262,7 @@ function _sb_active(string $path): bool
       </a>
     <?php endif; ?>
 
-    <?php if ($sidebarRole === 'estudiante'): ?>
+    <?php if ($isLoggedIn && $sidebarRole === 'estudiante'): ?>
       <a class="menu-link <?php echo _sb_active('public/app/student/catalog.php') || _sb_active('app/student/catalog.php') ? 'active' : ''; ?>"
          href="<?php echo htmlspecialchars(_sb_url('app/student/catalog.php')); ?>"
          data-tooltip="Catálogo" aria-label="Catálogo">
@@ -248,27 +285,31 @@ function _sb_active(string $path): bool
       </a>
     <?php endif; ?>
 
-    <a class="menu-link <?php echo _sb_active('public/app/profile/index.php') || _sb_active('app/profile/index.php') ? 'active' : ''; ?>"
-       href="<?php echo htmlspecialchars(_sb_url('app/profile/index.php')); ?>"
-       data-tooltip="Perfil" aria-label="Perfil">
-      <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
-      <span class="menu-label">Perfil</span>
-    </a>
+    <?php if ($isLoggedIn): ?>
+      <a class="menu-link <?php echo _sb_active('public/app/profile/index.php') || _sb_active('app/profile/index.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/profile/index.php')); ?>"
+         data-tooltip="Perfil" aria-label="Perfil">
+        <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
+        <span class="menu-label">Perfil</span>
+      </a>
+    <?php endif; ?>
   </nav>
 
   <div class="sidebar-bottom">
-    <a href="<?php echo htmlspecialchars(_sb_url('app/profile/index.php')); ?>" class="sidebar-user link-to-profile" aria-label="Ir al perfil">
-      <img src="<?php echo htmlspecialchars(_sb_url('img/user_placeholder.png')); ?>" alt="Usuario"
-           onerror="this.style.display='none'; this.parentNode.querySelector('.user-icon').style.display='block'"
-           onload="this.parentNode.querySelector('.user-icon').style.display='none'">
-      <span class="user-icon material-symbols-outlined" style="display:none" aria-hidden="true">person</span>
-      <p><i><?php echo $username; ?></i></p>
-    </a>
+    <?php if ($isLoggedIn): ?>
+      <a href="<?php echo htmlspecialchars(_sb_url('app/profile/index.php')); ?>" class="sidebar-user link-to-profile" aria-label="Ir al perfil">
+        <img src="<?php echo htmlspecialchars(_sb_url('img/user_placeholder.png')); ?>" alt="Usuario"
+             onerror="this.style.display='none'; this.parentNode.querySelector('.user-icon').style.display='block'"
+             onload="this.parentNode.querySelector('.user-icon').style.display='none'">
+        <span class="user-icon material-symbols-outlined" style="display:none" aria-hidden="true">person</span>
+        <p><i><?php echo $username; ?></i></p>
+      </a>
 
-    <a href="<?php echo htmlspecialchars(_sb_url('logout.php')); ?>" class="logout-btn" aria-label="Cerrar sesión">
-      <span class="material-symbols-outlined" aria-hidden="true">logout</span>
-      <span class="menu-label">Cerrar sesión</span>
-    </a>
+      <a href="<?php echo htmlspecialchars(_sb_url('logout.php')); ?>" class="logout-btn" aria-label="Cerrar sesión">
+        <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+        <span class="menu-label">Cerrar sesión</span>
+      </a>
+    <?php endif; ?>
   </div>
 </aside>
 
@@ -277,5 +318,23 @@ function _sb_active(string $path): bool
   (function(){
     document.documentElement.classList.add('js');
     document.body.classList.add('has-sidebar');
+
+    var sb = document.querySelector('.sidebar');
+    if (!sb) return;
+
+    var hovering = false;
+    function syncExpanded(){
+      var expanded = hovering || sb.classList.contains('is-open');
+      document.body.classList.toggle('sidebar-expanded', expanded);
+    }
+
+    sb.addEventListener('mouseenter', function(){ hovering = true; syncExpanded(); });
+    sb.addEventListener('mouseleave', function(){ hovering = false; syncExpanded(); });
+    sb.addEventListener('focusin', function(){ hovering = true; syncExpanded(); });
+    sb.addEventListener('focusout', function(){ hovering = false; syncExpanded(); });
+
+    var obs = new MutationObserver(function(){ syncExpanded(); });
+    obs.observe(sb, { attributes: true, attributeFilter: ['class'] });
+    syncExpanded();
   })();
 </script>
