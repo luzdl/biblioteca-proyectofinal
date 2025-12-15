@@ -102,6 +102,7 @@ $categorias = $db->query(
     <title>Categorías de libros</title>
 
     <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/admin.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/bibliotecario.css')); ?>">
 </head>
 
 <body>
