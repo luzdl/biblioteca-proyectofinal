@@ -59,17 +59,8 @@ if ($busqueda !== '') {
 </head>
 <body>
 
-<header class="topbar">
-    <div class="logo">Biblioteca Digital</div>
-
-    <nav class="menu">
-        <a href="<?php echo htmlspecialchars(url_for('app/student/catalog.php')); ?>" class="active">Catálogo</a>
-        <a href="<?php echo htmlspecialchars(url_for('app/student/reservas.php')); ?>">Mis reservas</a>
-        <a href="<?php echo htmlspecialchars(url_for('app/student/historial.php')); ?>">Historial</a>
-    </nav>
-
-    <?php include __DIR__ . '/../../components/topbar_dropdown.php'; ?>
-</header>
+<?php include __DIR__ . '/../../components/sidebar.php'; ?>
+<?php include __DIR__ . '/../../components/topbar.php'; ?>
 
 <div class="container">
 
