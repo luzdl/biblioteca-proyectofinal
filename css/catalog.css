@@ -48,7 +48,7 @@
 }
 
 /* Responsivo */
-@media (max-width: 1100px){
+@media (max-width: 110px){
   .shelf-row{ grid-template-columns: repeat(3, minmax(120px,1fr)); }
 }
 @media (max-width: 820px){
@@ -105,7 +105,13 @@
   box-shadow: 0 8px 18px rgba(0,0,0,.08);
   text-align:center;
 }
-.book-item:hover .book-hover{ opacity:1; translate: 0 0; }
+.book-item:hover .book-hover{
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;   /* <— habilita clics dentro del overlay */
+  z-index: 2;             /* evita que algo lo tape */
+}
+
 
 .book-hover .meta{
   display:flex; flex-direction:column; gap:2px; margin-bottom:8px;
@@ -124,8 +130,16 @@
   padding:8px 12px;
   border-radius:8px;
   background:#C7764A;
-  color:#fff; text-decoration:none; font-weight:600; font-size:.9rem;
+  color:#fff;
+  text-decoration:none;
+  font-weight:600;
+  font-size:.9rem;
+
+  border: none;        /* AÑADIR */
+  outline: none;       /* AÑADIR */
+  box-shadow: none;    /* AÑADIR (por si acaso) */
 }
+
 .btn-reserve:hover{ filter:brightness(.93); }
 
 .reserve-disabled{
