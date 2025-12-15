@@ -8,7 +8,7 @@ $mensaje = '';
 $tipoMensaje = '';
 
 if (isset($_GET['eliminar'])) {
-    $id = (int) $_GET['eliminar'];
+    $id = Input::getInt('eliminar', 0);
     if ($id > 0) {
         try {
             $stmt = $db->prepare("DELETE FROM carreras WHERE id = :id");
@@ -24,7 +24,7 @@ if (isset($_GET['eliminar'])) {
 
 $carreraEditar = null;
 if (isset($_GET['editar'])) {
-    $id = (int) $_GET['editar'];
+    $id = Input::getInt('editar', 0);
     if ($id > 0) {
         $stmt = $db->prepare("SELECT id, nombre FROM carreras WHERE id = :id");
         $stmt->execute([':id' => $id]);
@@ -33,11 +33,14 @@ if (isset($_GET['editar'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = trim($_POST['nombre'] ?? '');
-    $id     = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+    $nombre = Input::postString('nombre');
+    $id = Input::postInt('id', 0);
 
-    if ($nombre === '') {
-        $mensaje = "El nombre de la carrera es obligatorio.";
+    $v = new Validator();
+    $v->required('nombre', $nombre, 'El nombre de la carrera es obligatorio.');
+
+    if (!$v->ok()) {
+        $mensaje = $v->firstError();
         $tipoMensaje = "error";
     } else {
         try {

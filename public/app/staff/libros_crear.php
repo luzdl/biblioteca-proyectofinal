@@ -76,13 +76,19 @@ $mensaje = "";
    ============================== */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $titulo = trim($_POST["titulo"]);
-    $autor = trim($_POST["autor"]);
-    $categoria_id = intval($_POST["categoria_id"]);
-    $descripcion = trim($_POST["descripcion"]);
-    $stock = intval($_POST["stock"]);
+    $titulo = Input::postString('titulo');
+    $autor = Input::postString('autor');
+    $categoria_id = Input::postInt('categoria_id', 0);
+    $descripcion = Input::postString('descripcion');
+    $stock = Input::postInt('stock', 0);
 
-    if ($titulo === "" || $autor === "" || $categoria_id <= 0 || $stock < 0) {
+    $v = new Validator();
+    $v->required('titulo', $titulo, 'El título es obligatorio.');
+    $v->required('autor', $autor, 'El autor es obligatorio.');
+    $v->minInt('categoria_id', $categoria_id, 1, 'Debe seleccionar una categoría válida.');
+    $v->minInt('stock', $stock, 0, 'El stock no puede ser negativo.');
+
+    if (!$v->ok()) {
         $mensaje = "Por favor completa todos los campos obligatorios.";
     } else {
 
