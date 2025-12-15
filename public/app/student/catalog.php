@@ -56,12 +56,14 @@ if ($busqueda !== "") {
     <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/components.css')); ?>">
     <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/components/book_card.css')); ?>">
     <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/catalog.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/libros_mas_usados.css')); ?>">
 </head>
 
 <body>
 
     <?php include __DIR__ . '/../../components/sidebar.php'; ?>
     <?php include __DIR__ . '/../../components/topbar.php'; ?>
+    <?php include_once __DIR__ . '/../../components/libros_mas_usados.php'; ?>
 
     <div class="catalog-wrap">
         <!-- Buscador -->
@@ -71,6 +73,10 @@ if ($busqueda !== "") {
                    value="<?php echo htmlspecialchars($busqueda); ?>">
             <button type="submit">Buscar</button>
         </form>
+
+        <?php if (function_exists('libros_mas_usados_render')): ?>
+            <?php libros_mas_usados_render($db, ['preserve_params' => ['q'], 'limit' => 5]); ?>
+        <?php endif; ?>
 
         <h2 class="section-title">Galería</h2>
 

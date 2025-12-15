@@ -1,14 +1,12 @@
 /* ========= Layout para convivir con sidebar/topbar ========= */
 .catalog-wrap{
   padding: 16px 24px;
-  margin-inline: auto;
+  margin-inline: 16px;
   max-width: min(1200px, 92vw);
 }
 
 /* Empuja un poco el contenido en desktop si tu sidebar ocupa un borde fijo */
-@media (min-width: 1100px){
-  .catalog-wrap{ padding-left: 40px; padding-right: 40px; }
-}
+
 
 /* ========= Secciones (título + enlace) ========= */
 .shelf-block{

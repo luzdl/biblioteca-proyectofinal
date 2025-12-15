@@ -27,11 +27,15 @@ html, body{
 
 /* Cuando existe sidebar (lo añade el componente al <body>) */
 body.has-sidebar{
-  padding-left: calc(var(--sb-width-expanded, 260px) + 16px);
+  padding-left: calc(var(--sb-width-collapsed, 72px) + 16px);
   background: var(--bg-page) !important;
+}
+body.has-sidebar.sidebar-expanded{
+  padding-left: calc(var(--sb-width-expanded, 260px) + 16px);
 }
 @media (max-width: 900px){
   body.has-sidebar{ padding-left: calc(var(--sb-width-collapsed, 72px) + 16px); }
+  body.has-sidebar.sidebar-expanded{ padding-left: calc(var(--sb-width-expanded, 260px) + 16px); }
 }
 
 /* -----------------------------------------
