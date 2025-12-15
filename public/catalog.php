@@ -28,10 +28,14 @@ $libros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Ajustar las rutas de las imágenes
 foreach ($libros as &$libro) {
     if (!empty($libro['imagen'])) {
-        $libro['imagen'] = 'img/portadas/' . $libro['imagen'];
+        if (function_exists('url_for')) {
+            $libro['imagen'] = url_for('img/portadas/' . ltrim((string)$libro['imagen'], '/'));
+        } else {
+            $libro['imagen'] = 'img/portadas/' . $libro['imagen'];
+        }
     } else {
         // Imagen por defecto si no hay portada
-        $libro['imagen'] = 'img/default-book.png';
+        $libro['imagen'] = function_exists('url_for') ? url_for('img/default-book.png') : 'img/default-book.png';
     }
 }
 unset($libro); // Rompe la referencia del último elemento

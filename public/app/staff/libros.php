@@ -55,19 +55,52 @@ if (isset($_GET['eliminado'])) {
 /* ==============================
    OBTENER LIBROS CON CATEGORÍA
    ============================== */
-$query = "
-    SELECT 
-        libros.id,
-        libros.titulo,
-        libros.autor,
-        libros.portada,
-        libros.stock,
-        categorias_libros.nombre AS categoria
-    FROM libros
-    INNER JOIN categorias_libros 
-        ON categorias_libros.id = libros.categoria_id
-    ORDER BY libros.titulo ASC
-";
+$hasUploadCol = false;
+try {
+    $col = $db->prepare("SHOW COLUMNS FROM libros LIKE :col");
+    $col->execute([':col' => 'portada_upload_id']);
+    $hasUploadCol = (bool)$col->fetch();
+} catch (Exception $e) {
+    $hasUploadCol = false;
+}
+
+if ($hasUploadCol) {
+    $query = "
+        SELECT
+            l.id,
+            l.titulo,
+            l.autor,
+            l.portada,
+            l.portada_upload_id,
+            l.stock,
+            c.nombre AS categoria,
+            u.relative_path AS portada_path
+        FROM libros l
+        INNER JOIN categorias_libros c ON c.id = l.categoria_id
+        LEFT JOIN uploads u ON u.id = l.portada_upload_id
+        ORDER BY l.titulo ASC
+    ";
+} else {
+    $query = "
+        SELECT
+            l.id,
+            l.titulo,
+            l.autor,
+            l.portada,
+            l.stock,
+            c.nombre AS categoria,
+            (
+                SELECT u.relative_path
+                FROM uploads u
+                WHERE u.stored_name = l.portada
+                ORDER BY u.id DESC
+                LIMIT 1
+            ) AS portada_path
+        FROM libros l
+        INNER JOIN categorias_libros c ON c.id = l.categoria_id
+        ORDER BY l.titulo ASC
+    ";
+}
 
 $libros = $db->query($query)->fetchAll();
 ?>
@@ -118,9 +151,19 @@ $libros = $db->query($query)->fetchAll();
             <?php foreach ($libros as $libro): ?>
                 <tr>
                     <td>
-                        <?php if ($libro['portada']): ?>
+                        <?php
+                            $portadaPath = (string)($libro['portada_path'] ?? '');
+                            $portadaFile = (string)($libro['portada'] ?? '');
+                            $imgUrl = '';
+                            if ($portadaPath !== '') {
+                                $imgUrl = url_for(ltrim($portadaPath, '/'));
+                            } elseif ($portadaFile !== '') {
+                                $imgUrl = url_for('img/portadas/' . ltrim($portadaFile, '/'));
+                            }
+                        ?>
+                        <?php if ($imgUrl !== ''): ?>
                             <img 
-                                src="<?php echo htmlspecialchars(url_for('img/portadas/' . $libro['portada'])); ?>" 
+                                src="<?php echo htmlspecialchars($imgUrl); ?>" 
                                 class="mini-portada"
                                 alt="Portada"
                             >
