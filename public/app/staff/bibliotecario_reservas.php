@@ -126,7 +126,6 @@ $reservas = $db->query($sql)->fetchAll();
 
                 <?php if (in_array($estadoNorm, ['aprobado', 'en_curso', 'en curso'], true)): ?>
                     <a href="<?php echo htmlspecialchars(url_for('app/staff/bibliotecario_reservas_acciones.php', ['action' => 'finalizar', 'id' => $r['id']])); ?>" class="btn finalizar" data-action="finalizar">Finalizar</a>
-                    <a href="<?php echo htmlspecialchars(url_for('app/staff/bibliotecario_reservas_acciones.php', ['action' => 'cancelar', 'id' => $r['id']])); ?>" class="btn cancelar" data-action="cancelar">Cancelar</a>
                 <?php endif ?>
 
                 <?php if (in_array($estadoNorm, ['cancelado', 'finalizado'], true)): ?>

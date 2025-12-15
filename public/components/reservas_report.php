@@ -185,6 +185,7 @@ if (!function_exists('reservas_report_handle_export')) {
         echo "<th>Estado</th>";
         echo "<th>Fecha reserva</th>";
         echo "<th>Fecha límite</th>";
+    
         echo "<th>Fecha devolución</th>";
         echo "<th>Días reservados</th>";
         echo "</tr>\n";
