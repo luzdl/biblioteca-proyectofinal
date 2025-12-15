@@ -32,8 +32,10 @@ if ($topbarRole === 'administrador') {
     ];
 } elseif ($topbarRole === 'bibliotecario') {
     $topbarLinks = [
-        ['label' => 'Panel', 'href' => _tb_url('app/staff/index.php')],
-        ['label' => 'Carreras', 'href' => _tb_url('app/admin/carreras.php')],
+        ['label' => 'Panel', 'href' => _tb_url('app/staff/dashboard.php')],
+        ['label' => 'Libros', 'href' => _tb_url('app/staff/libros.php')],
+        ['label' => 'Categorías', 'href' => _tb_url('app/staff/categorias.php')],
+        ['label' => 'Reservas', 'href' => _tb_url('app/staff/bibliotecario_reservas.php')],
     ];
 } elseif ($topbarRole === 'estudiante') {
     $topbarLinks = [

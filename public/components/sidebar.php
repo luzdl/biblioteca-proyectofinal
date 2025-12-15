@@ -247,18 +247,32 @@ function _sb_active(string $path): bool
     <?php endif; ?>
 
     <?php if ($isLoggedIn && $sidebarRole === 'bibliotecario'): ?>
-      <a class="menu-link <?php echo _sb_active('public/app/staff/index.php') || _sb_active('app/staff/index.php') ? 'active' : ''; ?>"
-         href="<?php echo htmlspecialchars(_sb_url('app/staff/index.php')); ?>"
+      <a class="menu-link <?php echo _sb_active('public/app/staff/dashboard.php') || _sb_active('app/staff/dashboard.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/staff/dashboard.php')); ?>"
          data-tooltip="Panel" aria-label="Panel">
         <span class="material-symbols-outlined" aria-hidden="true">dashboard</span>
         <span class="menu-label">Panel</span>
       </a>
 
-      <a class="menu-link <?php echo _sb_active('public/app/admin/carreras.php') || _sb_active('app/admin/carreras.php') ? 'active' : ''; ?>"
-         href="<?php echo htmlspecialchars(_sb_url('app/admin/carreras.php')); ?>"
-         data-tooltip="Carreras" aria-label="Carreras">
-        <span class="material-symbols-outlined" aria-hidden="true">school</span>
-        <span class="menu-label">Carreras</span>
+      <a class="menu-link <?php echo _sb_active('public/app/staff/libros.php') || _sb_active('app/staff/libros.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/staff/libros.php')); ?>"
+         data-tooltip="Libros" aria-label="Libros">
+        <span class="material-symbols-outlined" aria-hidden="true">menu_book</span>
+        <span class="menu-label">Libros</span>
+      </a>
+
+      <a class="menu-link <?php echo _sb_active('public/app/staff/categorias.php') || _sb_active('app/staff/categorias.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/staff/categorias.php')); ?>"
+         data-tooltip="Categorías" aria-label="Categorías">
+        <span class="material-symbols-outlined" aria-hidden="true">category</span>
+        <span class="menu-label">Categorías</span>
+      </a>
+
+      <a class="menu-link <?php echo _sb_active('public/app/staff/bibliotecario_reservas.php') || _sb_active('app/staff/bibliotecario_reservas.php') ? 'active' : ''; ?>"
+         href="<?php echo htmlspecialchars(_sb_url('app/staff/bibliotecario_reservas.php')); ?>"
+         data-tooltip="Reservas" aria-label="Reservas">
+        <span class="material-symbols-outlined" aria-hidden="true">list_alt</span>
+        <span class="menu-label">Reservas</span>
       </a>
     <?php endif; ?>
 
