@@ -18,17 +18,21 @@
 /* Grid de tarjetas */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 22px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: stretch;
 }
 
 /* Tarjeta base */
 .dash-card {
     background: #ffffff;
-    padding: 22px;
+    padding: 30px 34px;
+    min-height: 150px;
     border-radius: 14px;
     border: 1px solid #e6d8c7;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
     text-align: center;
     transition: 0.25s;
 }
@@ -39,9 +43,22 @@
 }
 
 .dash-card h2 {
-    font-size: 34px;
+    font-size: 38px;
     color: var(--coffee);
-    margin: 8px 0 2px;
+    margin: 8px 0 4px;
+}
+
+/* Responsive: una columna en pantallas pequeñas */
+@media (max-width: 880px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        max-width: 720px;
+        padding: 0 12px;
+    }
+    .dash-card {
+        min-height: 120px;
+        padding: 22px;
+    }
 }
 
 .dash-card p {

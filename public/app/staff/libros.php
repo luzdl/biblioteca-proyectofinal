@@ -1,42 +1,63 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'bibliotecario') {
-    header("Location: ../public/login.php");
+/* ==============================
+   VALIDAR ACCESO DEL BIBLIOTECARIO
+   ============================== */
+if (
+    !isset($_SESSION['usuario_rol']) ||
+    $_SESSION['usuario_rol'] !== 'bibliotecario'
+) {
+    header("Location: ../../login.php");
     exit;
 }
 
-require_once "../config/database.php";
+/* ==============================
+   CONEXIÓN A LA BASE DE DATOS
+   ============================== */
+require_once __DIR__ . "/../../../config/database.php";
+require_once __DIR__ . "/../../../config/env.php";
+
 $db = (new Database())->getConnection();
 
-/* Obtiene lista de libros con su categoría */
+/* ==============================
+   OBTENER LIBROS CON CATEGORÍA
+   ============================== */
 $query = "
-    SELECT libros.id, libros.titulo, libros.autor, libros.portada, libros.stock,
-           categorias_libros.nombre AS categoria
+    SELECT 
+        libros.id,
+        libros.titulo,
+        libros.autor,
+        libros.portada,
+        libros.stock,
+        categorias_libros.nombre AS categoria
     FROM libros
-    INNER JOIN categorias_libros ON categorias_libros.id = libros.categoria_id
+    INNER JOIN categorias_libros 
+        ON categorias_libros.id = libros.categoria_id
     ORDER BY libros.titulo ASC
 ";
 
 $libros = $db->query($query)->fetchAll();
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <title>Gestión de libros</title>
-    <link rel="stylesheet" href="../css/sidebar.css">
-    <link rel="stylesheet" href="../css/bibliotecario.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+
+    <!-- ESTILOS (RUTAS CORRECTAS) -->
+    <link rel="stylesheet" href="../../../css/sidebar.css">
+    <link rel="stylesheet" href="../../../css/bibliotecario.css">
+
+    <!-- ICONOS -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 
 <body>
 
-<?php 
-$active = "libros";
-include "sidebar.php"; 
+<?php
+    $active = "libros";
+    include __DIR__ . "/sidebar.php";
 ?>
 
 <main class="content">
@@ -63,7 +84,11 @@ include "sidebar.php";
                 <tr>
                     <td>
                         <?php if ($libro['portada']): ?>
-                            <img src="../img/portadas/<?= htmlspecialchars($libro['portada']); ?>" class="mini-portada">
+                            <img 
+                                src="../../../img/portadas/<?= htmlspecialchars($libro['portada']); ?>" 
+                                class="mini-portada"
+                                alt="Portada"
+                            >
                         <?php else: ?>
                             <span class="no-img">Sin imagen</span>
                         <?php endif; ?>
@@ -83,15 +108,17 @@ include "sidebar.php";
 
                     <td class="actions">
                         <a class="btn-edit" href="libros_editar.php?id=<?= $libro['id'] ?>">Editar</a>
-                        <a class="btn-delete" href="libros_eliminar.php?id=<?= $libro['id'] ?>"
-                           onclick="return confirm('¿Seguro que deseas eliminar este libro?')">
+                        <a 
+                            class="btn-delete"
+                            href="libros_eliminar.php?id=<?= $libro['id'] ?>"
+                            onclick="return confirm('¿Seguro que deseas eliminar este libro?')"
+                        >
                             Eliminar
                         </a>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
-
     </table>
 
 </main>

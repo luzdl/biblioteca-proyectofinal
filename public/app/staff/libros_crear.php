@@ -1,20 +1,37 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'bibliotecario') {
-    header("Location: ../public/login.php");
+/* ==============================
+   VALIDAR ACCESO DEL BIBLIOTECARIO
+   ============================== */
+if (
+    !isset($_SESSION['usuario_rol']) ||
+    $_SESSION['usuario_rol'] !== 'bibliotecario'
+) {
+    header("Location: ../../login.php");
     exit;
 }
 
-require_once "../config/database.php";
+/* ==============================
+   CONEXIÓN A LA BASE DE DATOS
+   ============================== */
+require_once __DIR__ . "/../../../config/database.php";
+require_once __DIR__ . "/../../../config/env.php";
+
 $db = (new Database())->getConnection();
 
-/* Obtener categorías */
-$categorias = $db->query("SELECT * FROM categorias_libros ORDER BY nombre ASC")->fetchAll();
+/* ==============================
+   OBTENER CATEGORÍAS
+   ============================== */
+$categorias = $db->query(
+    "SELECT * FROM categorias_libros ORDER BY nombre ASC"
+)->fetchAll();
 
 $mensaje = "";
 
-/* Procesar formulario */
+/* ==============================
+   PROCESAR FORMULARIO
+   ============================== */
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $titulo = trim($_POST["titulo"]);
@@ -23,62 +40,71 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $descripcion = trim($_POST["descripcion"]);
     $stock = intval($_POST["stock"]);
 
-    /* Validación simple */
     if ($titulo === "" || $autor === "" || $categoria_id <= 0 || $stock < 0) {
         $mensaje = "Por favor completa todos los campos obligatorios.";
     } else {
-        /* Subida de portada */
+
         $portadaNombre = null;
 
         if (!empty($_FILES["portada"]["name"])) {
             $archivo = $_FILES["portada"];
-            $ext = pathinfo($archivo["name"], PATHINFO_EXTENSION);
+            $ext = strtolower(pathinfo($archivo["name"], PATHINFO_EXTENSION));
 
-            $portadaNombre = uniqid("libro_") . "." . $ext;
+            $permitidas = ["jpg", "jpeg", "png", "webp"];
 
-            move_uploaded_file(
-                $archivo["tmp_name"],
-                "../img/portadas/" . $portadaNombre
-            );
+            if (!in_array($ext, $permitidas)) {
+                $mensaje = "Formato de imagen no permitido.";
+            } else {
+                $portadaNombre = uniqid("libro_") . "." . $ext;
+                move_uploaded_file(
+                    $archivo["tmp_name"],
+                    "../../../img/portadas/" . $portadaNombre
+                );
+            }
         }
 
-        /* Insertar libro */
-        $sql = "INSERT INTO libros (titulo, autor, categoria_id, descripcion, portada, stock)
-                VALUES (:titulo, :autor, :categoria_id, :descripcion, :portada, :stock)";
-        
-        $stmt = $db->prepare($sql);
+        if ($mensaje === "") {
+            $stmt = $db->prepare("
+                INSERT INTO libros
+                (titulo, autor, categoria_id, descripcion, portada, stock)
+                VALUES
+                (:titulo, :autor, :categoria_id, :descripcion, :portada, :stock)
+            ");
 
-        $stmt->execute([
-            ":titulo" => $titulo,
-            ":autor" => $autor,
-            ":categoria_id" => $categoria_id,
-            ":descripcion" => $descripcion,
-            ":portada" => $portadaNombre,
-            ":stock" => $stock
-        ]);
+            $stmt->execute([
+                ":titulo" => $titulo,
+                ":autor" => $autor,
+                ":categoria_id" => $categoria_id,
+                ":descripcion" => $descripcion,
+                ":portada" => $portadaNombre,
+                ":stock" => $stock
+            ]);
 
-        header("Location: libros.php?creado=1");
-        exit;
+            header("Location: libros.php?creado=1");
+            exit;
+        }
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <title>Agregar libro</title>
-    <link rel="stylesheet" href="../css/sidebar.css">
-    <link rel="stylesheet" href="../css/bibliotecario.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined">
+
+    <!-- ESTILOS CORRECTOS -->
+    <link rel="stylesheet" href="../../../css/sidebar.css">
+    <link rel="stylesheet" href="../../../css/bibliotecario.css">
+
+    <!-- ICONOS -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 
 <body>
 
-<?php 
-$active = "libros";
-include "sidebar.php"; 
+<?php
+    $active = "libros";
+    include __DIR__ . "/sidebar.php";
 ?>
 
 <main class="content">
@@ -86,7 +112,7 @@ include "sidebar.php";
     <h1 class="page-title">Agregar nuevo libro</h1>
 
     <?php if ($mensaje): ?>
-        <p class="error-msg"><?= $mensaje ?></p>
+        <p class="error-msg"><?= htmlspecialchars($mensaje) ?></p>
     <?php endif; ?>
 
     <form method="POST" enctype="multipart/form-data" class="form-card">
@@ -106,7 +132,9 @@ include "sidebar.php";
             <select name="categoria_id" required>
                 <option value="">Seleccionar categoría</option>
                 <?php foreach ($categorias as $c): ?>
-                    <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nombre']) ?></option>
+                    <option value="<?= $c['id'] ?>">
+                        <?= htmlspecialchars($c['nombre']) ?>
+                    </option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -127,9 +155,11 @@ include "sidebar.php";
         </div>
 
         <button type="submit" class="btn-save">Guardar libro</button>
+
     </form>
 
 </main>
 
 </body>
 </html>
+3

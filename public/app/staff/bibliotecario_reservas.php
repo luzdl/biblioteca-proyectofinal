@@ -7,7 +7,9 @@ if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'biblioteca
     exit;
 }
 
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . "/../../../config/database.php";
+require_once __DIR__ . "/../../../config/env.php";
+
 $db = (new Database())->getConnection();
 
 // Obtener reservas con datos del usuario y libro
