@@ -1,14 +1,6 @@
 <?php
-session_start();
-
-// Restringir acceso solo a bibliotecarios
-if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'bibliotecario') {
-    header("Location: login.php");
-    exit;
-}
-
-require_once __DIR__ . "/../../../config/database.php";
-require_once __DIR__ . "/../../../config/env.php";
+require_once __DIR__ . '/../../lib/bootstrap.php';
+require_role(['administrador', 'bibliotecario']);
 
 $db = (new Database())->getConnection();
 
@@ -28,9 +20,10 @@ $reservas = $db->query($sql)->fetchAll();
 <head>
     <meta charset="UTF-8">
     <title>Reservas pendientes | Bibliotecario</title>
-    <link rel="stylesheet" href="../css/sidebar.css">
+
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/admin.css')); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/bibliotecario.css')); ?>">
     <style>
-        .content { margin-left: 260px; padding: 30px; }
         h1 { color: #7A5C3A; }
         table {
             width: 100%;
@@ -63,9 +56,10 @@ $reservas = $db->query($sql)->fetchAll();
 
 <body>
 
-<?php include 'sidebar_bibliotecario.php'; ?>
+<?php include __DIR__ . '/../../components/sidebar.php'; ?>
+<?php include __DIR__ . '/../../components/topbar.php'; ?>
 
-<div class="content">
+<main class="content">
     <h1>Gestión de reservas</h1>
 
     <table>
@@ -90,18 +84,18 @@ $reservas = $db->query($sql)->fetchAll();
 
             <td>
                 <?php if ($r['estado'] === 'pendiente'): ?>
-                    <a href="bibliotecario_reservas_acciones.php?action=aprobar&id=<?= $r['id'] ?>" class="btn aprobar">Aprobar</a>
+                    <a href="<?php echo htmlspecialchars(url_for('app/staff/bibliotecario_reservas_acciones.php', ['action' => 'aprobar', 'id' => $r['id']])); ?>" class="btn aprobar">Aprobar</a>
                 <?php endif ?>
 
                 <?php if ($r['estado'] === 'en_curso'): ?>
-                    <a href="bibliotecario_reservas_acciones.php?action=finalizar&id=<?= $r['id'] ?>" class="btn finalizar">Finalizar</a>
+                    <a href="<?php echo htmlspecialchars(url_for('app/staff/bibliotecario_reservas_acciones.php', ['action' => 'finalizar', 'id' => $r['id']])); ?>" class="btn finalizar">Finalizar</a>
                 <?php endif ?>
             </td>
         </tr>
         <?php endforeach; ?>
 
     </table>
-</div>
+</main>
 
 </body>
 </html>

@@ -1,24 +1,12 @@
 <?php
-session_start();
-
-/* ==============================
-   VALIDAR ACCESO DEL BIBLIOTECARIO
-   ============================== */
-if (
-    !isset($_SESSION['usuario_rol']) ||
-    $_SESSION['usuario_rol'] !== 'bibliotecario'
-) {
-    header("Location: ../../login.php");
-    exit;
-}
-
-/* ==============================
-   CONEXIÓN A LA BASE DE DATOS
-   ============================== */
-require_once __DIR__ . "/../../../config/database.php";
-require_once __DIR__ . "/../../../config/env.php";
+require_once __DIR__ . '/../../lib/bootstrap.php';
+require_role(['administrador', 'bibliotecario']);
 
 $db = (new Database())->getConnection();
+
+$selfPath = current_role() === 'bibliotecario'
+    ? 'app/staff/categorias.php'
+    : 'app/admin/categorias.php';
 
 $mensaje = "";
 $tipoMensaje = "";
@@ -113,24 +101,17 @@ $categorias = $db->query(
     <meta charset="UTF-8">
     <title>Categorías de libros</title>
 
-    <!-- ESTILOS CORRECTOS -->
-    <link rel="stylesheet" href="../../../css/sidebar.css">
-    <link rel="stylesheet" href="../../../css/bibliotecario.css">
-
-    <!-- ICONOS -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(url_for('css/admin.css')); ?>">
 </head>
 
 <body>
 
-<?php
-    $active = "categorias";
-    include __DIR__ . "/sidebar.php";
-?>
+<?php include __DIR__ . '/../../components/sidebar.php'; ?>
+<?php include __DIR__ . '/../../components/topbar.php'; ?>
 
 <main class="content">
 
-    <h1 class="page-title">Categorías de libros</h1>
+    <h1 class="title">Categorías de libros</h1>
 
     <?php if ($mensaje): ?>
         <p class="alert <?= $tipoMensaje === 'error' ? 'alert-error' : 'alert-success' ?>">
@@ -139,60 +120,60 @@ $categorias = $db->query(
     <?php endif; ?>
 
     <!-- FORMULARIO -->
-    <section class="form-card small-card">
-        <h3><?= $categoriaEditar ? 'Editar categoría' : 'Nueva categoría' ?></h3>
+    <section class="form-section">
+        <h2><?php echo $categoriaEditar ? 'Editar categoría' : 'Nueva categoría'; ?></h2>
 
-        <form method="post">
+        <form method="post" action="" class="crud-form">
             <input type="hidden" name="id" value="<?= $categoriaEditar['id'] ?? 0 ?>">
 
-            <div class="field">
-                <label>Nombre</label>
-                <input
-                    type="text"
-                    name="nombre"
-                    required
-                    value="<?= htmlspecialchars($categoriaEditar['nombre'] ?? '') ?>"
-                >
+            <label>
+                Nombre:
+                <input type="text" name="nombre" value="<?= htmlspecialchars($categoriaEditar['nombre'] ?? '') ?>" required>
+            </label>
+
+            <div class="form-actions">
+                <button type="submit"><?php echo $categoriaEditar ? 'Actualizar' : 'Guardar'; ?></button>
+                <?php if ($categoriaEditar): ?>
+                    <a href="<?php echo htmlspecialchars(url_for($selfPath)); ?>" class="btn-cancel">Cancelar</a>
+                <?php endif; ?>
             </div>
-
-            <button type="submit" class="btn-save">
-                <?= $categoriaEditar ? 'Guardar cambios' : 'Crear categoría' ?>
-            </button>
-
-            <?php if ($categoriaEditar): ?>
-                <a href="categorias.php" class="btn-close">Cancelar</a>
-            <?php endif; ?>
         </form>
     </section>
 
     <!-- LISTADO -->
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th width="200">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($categorias as $cat): ?>
-            <tr>
-                <td><?= htmlspecialchars($cat['nombre']) ?></td>
-                <td class="actions">
-                    <a class="btn-edit" href="categorias.php?editar=<?= $cat['id'] ?>">
-                        Editar
-                    </a>
-                    <a
-                        class="btn-delete"
-                        href="categorias.php?eliminar=<?= $cat['id'] ?>"
-                        onclick="return confirm('¿Eliminar esta categoría?')"
-                    >
-                        Eliminar
-                    </a>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
+    <section class="list-section">
+        <h2>Listado de categorías</h2>
+
+        <?php if (count($categorias) === 0): ?>
+            <p>No hay categorías registradas.</p>
+        <?php else: ?>
+            <table class="crud-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($categorias as $cat): ?>
+                    <tr>
+                        <td><?php echo $cat['id']; ?></td>
+                        <td><?php echo htmlspecialchars($cat['nombre']); ?></td>
+                        <td>
+                            <a href="<?php echo htmlspecialchars(url_for($selfPath, ['editar' => $cat['id']])); ?>">Editar</a>
+                            |
+                            <a href="<?php echo htmlspecialchars(url_for($selfPath, ['eliminar' => $cat['id']])); ?>"
+                               onclick="return confirm('¿Seguro que deseas eliminar esta categoría?');">
+                               Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+    </section>
 
 </main>
 

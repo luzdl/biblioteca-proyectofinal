@@ -281,8 +281,8 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php if ((int)$u['id'] !== (int)($_SESSION['usuario_id'] ?? 0)): ?>
                             |
                             <a class="usuarios-link" href="<?php echo htmlspecialchars(url_for('app/admin/usuarios.php', ['eliminar' => $u['id']])); ?>"
-                               onclick="return confirm('¿Seguro que deseas eliminar este usuario?');">
-                               Eliminar
+                                onclick="return confirm('¿Seguro que deseas eliminar este usuario?');">
+                                Eliminar
                             </a>
                             <?php endif; ?>
                         </td>
