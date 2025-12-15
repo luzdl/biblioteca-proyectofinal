@@ -21,6 +21,13 @@ if (!$reserva) {
     die("Reserva no encontrada");
 }
 
+$estadoRaw = (string)($reserva['estado'] ?? '');
+$estadoNorm = strtolower(trim($estadoRaw));
+$hasFechaLimite = !empty($reserva['fecha_limite']);
+if ($estadoNorm === '' && $hasFechaLimite) {
+    $estadoNorm = 'en_curso';
+}
+
 /* ============================================================
                 APROBAR RESERVA
    ============================================================ */
@@ -59,6 +66,48 @@ if ($action === "finalizar") {
     // devolver stock
     $db->prepare("UPDATE libros SET stock = stock + 1 WHERE id = ?")
        ->execute([$reserva['libro_id']]);
+
+    header('Location: ' . url_for('app/staff/bibliotecario_reservas.php'));
+    exit;
+}
+
+/* ============================================================
+                 CANCELAR RESERVA
+   ============================================================ */
+if ($action === "cancelar") {
+
+    // Si ya está cancelada/finalizada, no hacer nada
+    if (in_array($estadoNorm, ['cancelado', 'finalizado'], true)) {
+        header('Location: ' . url_for('app/staff/bibliotecario_reservas.php'));
+        exit;
+    }
+
+    // Si estaba aprobada/en curso, devolver stock
+    if (in_array($estadoNorm, ['en_curso', 'en curso', 'aprobado'], true)) {
+        $db->prepare("UPDATE libros SET stock = stock + 1 WHERE id = ?")
+           ->execute([$reserva['libro_id']]);
+    }
+
+    $db->prepare("UPDATE reservas SET estado = 'cancelado' WHERE id = ?")
+       ->execute([$id]);
+
+    header('Location: ' . url_for('app/staff/bibliotecario_reservas.php'));
+    exit;
+}
+
+/* ============================================================
+                 ELIMINAR RESERVA
+   ============================================================ */
+if ($action === "eliminar") {
+
+    // Si está activa/aprobada, devolver stock antes de eliminar
+    if (in_array($estadoNorm, ['en_curso', 'en curso', 'aprobado'], true)) {
+        $db->prepare("UPDATE libros SET stock = stock + 1 WHERE id = ?")
+           ->execute([$reserva['libro_id']]);
+    }
+
+    $db->prepare("DELETE FROM reservas WHERE id = ?")
+       ->execute([$id]);
 
     header('Location: ' . url_for('app/staff/bibliotecario_reservas.php'));
     exit;
