@@ -1,11 +1,11 @@
-/* ================================
-        SIDEBAR TONOS TIERRA
-   ================================ */
+/* ========================================
+        SIDEBAR PREMIUM TONOS TIERRA
+   ======================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 
-/* Ajustes globales */
+/* Variables */
 :root {
     --coffee: #7A5C3A;
     --coffee-light: #D6C4AF;
@@ -18,74 +18,73 @@
 }
 
 body {
-    font-family: "Inter", sans-serif;
     margin: 0;
+    font-family: "Inter", sans-serif;
     background: var(--bg);
 }
 
-/* -------------------------------
-        SIDEBAR FIJO CORREGIDO
-   ------------------------------- */
-
+/* Sidebar fijo */
 .sidebar {
     position: fixed;
-    left: 0;
     top: 0;
+    left: 0;
     width: 240px;
     height: 100vh;
     background: var(--bg);
-    padding: 16px 14px;
     border-right: 1px solid var(--line);
+    box-shadow: 3px 0 6px rgba(0,0,0,0.05);
+    padding: 20px 14px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 3px 0 6px rgba(0,0,0,0.05);
     z-index: 1000;
 }
 
-/* Logo */
-.sidebar-logo {
+/* Header */
+.sidebar-header {
     text-align: center;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--line);
+    margin-bottom: 20px;
 }
 
-.sidebar-logo img {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    border: 2px solid var(--coffee-light);
-    object-fit: cover;
-}
-
-.sidebar-logo h2 {
-    font-size: 20px;
-    margin: 6px 0 0;
-    font-weight: 700;
+.sidebar-header h2 {
+    font-size: 22px;
+    margin: 0;
     color: var(--coffee);
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
-/* Menu */
+.role-tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: #B28863;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+/* Menú */
 .sidebar-menu {
-    margin-top: 20px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 .sidebar-menu a {
-    padding: 10px 14px;
-    font-size: 15px;
-    color: var(--text);
     text-decoration: none;
+    color: var(--text);
+    padding: 10px 14px;
     border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     transition: 0.25s;
+    font-size: 15px;
 }
 
 .sidebar-menu a:hover {
     background: var(--coffee-hover);
-    color: var(--coffee);
     transform: translateX(4px);
+    color: var(--coffee);
 }
 
 .sidebar-menu a.active {
@@ -93,48 +92,49 @@ body {
     font-weight: 600;
 }
 
-/* Cerrar sesión */
+/* Iconos */
+.material-symbols-outlined {
+    font-size: 22px;
+    color: var(--coffee);
+}
+
+/* Botón cerrar sesión */
 .logout-btn {
-    margin: 20px 0;
     background: var(--danger-light);
-    text-align: center;
-    padding: 10px;
-    border-radius: 8px;
     color: #7a2f2f;
+    padding: 10px;
+    text-align: center;
+    border-radius: 8px;
     font-weight: bold;
     text-decoration: none;
     transition: 0.25s;
+    margin-top: 20px;
 }
 
 .logout-btn:hover {
     background: var(--danger-hover);
 }
 
-/* Usuario */
+/* Usuario inferior */
 .sidebar-user {
     text-align: center;
-    margin-bottom: 15px;
+    padding-bottom: 10px;
 }
 
-.sidebar-user img {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 2px solid var(--coffee-light);
-    margin-bottom: 6px;
+.user-icon {
+    font-size: 40px;
+    color: var(--coffee);
 }
 
 .sidebar-user p {
+    margin-top: 4px;
     font-size: 14px;
     color: var(--coffee);
     font-style: italic;
 }
 
-/* -------------------------------
-       CONTENIDO PRINCIPAL
-   ------------------------------- */
-
+/* Ajuste del contenido principal */
 .content {
-    margin-left: 260px; /* ← Este ajuste elimina el espacio blanco */
+    margin-left: 260px;
     padding: 40px;
 }
