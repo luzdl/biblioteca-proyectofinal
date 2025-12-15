@@ -27,7 +27,7 @@ try {
                 OR TRIM(r.estado) = ''
                 OR LOWER(TRIM(r.estado)) <> 'cancelado'
            )
-         ORDER BY r.fecha_reserva DESC"
+         ORDER BY r.id DESC"
     );
     $stmt->execute([':usuario_id' => (int)$_SESSION['usuario_id']]);
     $todas = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
@@ -55,7 +55,7 @@ try {
          INNER JOIN libros l ON l.id = r.libro_id
          WHERE r.usuario_id = :usuario_id
            AND LOWER(TRIM(r.estado)) = 'cancelado'
-         ORDER BY r.fecha_reserva DESC
+         ORDER BY r.id DESC
          LIMIT 1"
     );
     $stmt->execute([':usuario_id' => (int)$_SESSION['usuario_id']]);
